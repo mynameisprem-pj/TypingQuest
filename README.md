@@ -203,4 +203,4 @@ This project is open source and free to use for educational purposes.
 
 
 ## Live Demo
-- https://typinggame-virid.vercel.app/
+- https://typing-quest-xi.vercel.app/
