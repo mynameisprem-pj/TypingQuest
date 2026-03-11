@@ -66,7 +66,7 @@ Two fully playable games with more coming soon:
 
 ## 🖼️ Screenshots
 
-> *(Add your screenshots here after deploying)*
+> *(- assets/)*
 
 ---
 
