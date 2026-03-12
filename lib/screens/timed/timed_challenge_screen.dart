@@ -11,25 +11,218 @@ import '../../widgets/achievement_toast.dart';
 
 // Word bank for timed mode — mix of common English words
 const List<String> _kWords = [
-  'the','and','to','a','of','in','is','it','you','that','he','was','for','on',
-  'are','with','as','his','they','at','be','this','from','or','one','had','by',
-  'word','but','not','what','all','were','we','when','your','can','said','there',
-  'use','an','each','which','she','do','how','their','if','will','up','other',
-  'about','out','many','then','them','these','so','some','her','would','make',
-  'like','him','has','look','two','more','write','go','see','number','no','way',
-  'could','people','my','than','first','water','been','call','who','oil','its',
-  'now','find','long','down','day','did','get','come','made','may','part','over',
-  'new','sound','take','only','little','work','know','place','year','live','give',
-  'most','very','after','thing','our','just','name','good','sentence','man','think',
-  'say','great','where','help','through','much','before','line','right','too','mean',
-  'old','any','same','tell','boy','following','came','want','show','also','around',
-  'form','small','set','put','end','does','another','well','large','need','big',
-  'high','such','turn','here','why','went','men','read','land','different','home',
-  'move','try','kind','hand','picture','again','change','off','play','spell','air',
-  'away','animal','house','point','page','letter','mother','answer','found','study',
-  'still','learn','should','world','school','keep','plant','cover','food','sun',
-  'computer','type','fast','practice','keyboard','finger','speed','word','level',
-  'Nepal','mountain','student','teacher','class','book','write','read','learn',
+  'the',
+  'and',
+  'to',
+  'a',
+  'of',
+  'in',
+  'is',
+  'it',
+  'you',
+  'that',
+  'he',
+  'was',
+  'for',
+  'on',
+  'are',
+  'with',
+  'as',
+  'his',
+  'they',
+  'at',
+  'be',
+  'this',
+  'from',
+  'or',
+  'one',
+  'had',
+  'by',
+  'word',
+  'but',
+  'not',
+  'what',
+  'all',
+  'were',
+  'we',
+  'when',
+  'your',
+  'can',
+  'said',
+  'there',
+  'use',
+  'an',
+  'each',
+  'which',
+  'she',
+  'do',
+  'how',
+  'their',
+  'if',
+  'will',
+  'up',
+  'other',
+  'about',
+  'out',
+  'many',
+  'then',
+  'them',
+  'these',
+  'so',
+  'some',
+  'her',
+  'would',
+  'make',
+  'like',
+  'him',
+  'has',
+  'look',
+  'two',
+  'more',
+  'write',
+  'go',
+  'see',
+  'number',
+  'no',
+  'way',
+  'could',
+  'people',
+  'my',
+  'than',
+  'first',
+  'water',
+  'been',
+  'call',
+  'who',
+  'oil',
+  'its',
+  'now',
+  'find',
+  'long',
+  'down',
+  'day',
+  'did',
+  'get',
+  'come',
+  'made',
+  'may',
+  'part',
+  'over',
+  'new',
+  'sound',
+  'take',
+  'only',
+  'little',
+  'work',
+  'know',
+  'place',
+  'year',
+  'live',
+  'give',
+  'most',
+  'very',
+  'after',
+  'thing',
+  'our',
+  'just',
+  'name',
+  'good',
+  'sentence',
+  'man',
+  'think',
+  'say',
+  'great',
+  'where',
+  'help',
+  'through',
+  'much',
+  'before',
+  'line',
+  'right',
+  'too',
+  'mean',
+  'old',
+  'any',
+  'same',
+  'tell',
+  'boy',
+  'following',
+  'came',
+  'want',
+  'show',
+  'also',
+  'around',
+  'form',
+  'small',
+  'set',
+  'put',
+  'end',
+  'does',
+  'another',
+  'well',
+  'large',
+  'need',
+  'big',
+  'high',
+  'such',
+  'turn',
+  'here',
+  'why',
+  'went',
+  'men',
+  'read',
+  'land',
+  'different',
+  'home',
+  'move',
+  'try',
+  'kind',
+  'hand',
+  'picture',
+  'again',
+  'change',
+  'off',
+  'play',
+  'spell',
+  'air',
+  'away',
+  'animal',
+  'house',
+  'point',
+  'page',
+  'letter',
+  'mother',
+  'answer',
+  'found',
+  'study',
+  'still',
+  'learn',
+  'should',
+  'world',
+  'school',
+  'keep',
+  'plant',
+  'cover',
+  'food',
+  'sun',
+  'computer',
+  'type',
+  'fast',
+  'practice',
+  'keyboard',
+  'finger',
+  'speed',
+  'word',
+  'level',
+  'Nepal',
+  'mountain',
+  'student',
+  'teacher',
+  'class',
+  'book',
+  'write',
+  'read',
+  'learn',
 ];
 
 String _generateText(int targetWords) {
@@ -49,9 +242,10 @@ class TimedChallengeScreen extends StatefulWidget {
   State<TimedChallengeScreen> createState() => _TimedChallengeScreenState();
 }
 
-class _TimedChallengeScreenState extends State<TimedChallengeScreen> with TickerProviderStateMixin {
+class _TimedChallengeScreenState extends State<TimedChallengeScreen>
+    with TickerProviderStateMixin {
   static const List<int> _durations = [60, 120, 300];
-  static const List<String> _labels  = ['1 MIN', '2 MIN', '5 MIN'];
+  static const List<String> _labels = ['1 MIN', '2 MIN', '5 MIN'];
 
   late int _selectedDuration;
   bool _isCustom = false;
@@ -74,6 +268,8 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
   int _correctStreak = 0;
 
   final FocusNode _focusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _cursorKey = GlobalKey();
   late AnimationController _finishCtrl;
   late Animation<double> _finishAnim;
 
@@ -84,8 +280,14 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
     _text = _generateText(300);
     _timeLeft = _selectedDuration;
     _stopwatch = Stopwatch();
-    _finishCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
-    _finishAnim = CurvedAnimation(parent: _finishCtrl, curve: Curves.elasticOut);
+    _finishCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _finishAnim = CurvedAnimation(
+      parent: _finishCtrl,
+      curve: Curves.elasticOut,
+    );
 
     AchievementsService().onUnlock = (ach) {
       if (mounted) {
@@ -100,6 +302,7 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
     _timer?.cancel();
     _finishCtrl.dispose();
     _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -147,6 +350,20 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
     );
   }
 
+  void _scrollToCursor() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = _cursorKey.currentContext;
+      if (ctx != null) {
+        Scrollable.ensureVisible(
+          ctx,
+          duration: const Duration(milliseconds: 80),
+          curve: Curves.easeOut,
+          alignment: 0.3, // keep cursor in upper-third of scroll area
+        );
+      }
+    });
+  }
+
   void _startTimer() {
     _stopwatch.start();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
@@ -173,16 +390,21 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
     final wordsTyped = _currentIndex ~/ 5;
     final accuracy = _errorCount == 0 || _currentIndex == 0
         ? 100.0
-        : ((_currentIndex - _errorCount) / _currentIndex * 100).clamp(0.0, 100.0);
+        : ((_currentIndex - _errorCount) / _currentIndex * 100).clamp(
+            0.0,
+            100.0,
+          );
 
-    await StatsService().recordSession(TypingSession(
-      date: DateTime.now(),
-      wpm: _wpm,
-      accuracy: accuracy,
-      wordsTyped: wordsTyped,
-      durationSeconds: _selectedDuration,
-      mode: 'timed',
-    ));
+    await StatsService().recordSession(
+      TypingSession(
+        date: DateTime.now(),
+        wpm: _wpm,
+        accuracy: accuracy,
+        wordsTyped: wordsTyped,
+        durationSeconds: _selectedDuration,
+        mode: 'timed',
+      ),
+    );
 
     await AchievementsService().checkAll(
       bestWpm: StatsService().getBestWpm(),
@@ -205,14 +427,21 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
       char = ' ';
     } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
       if (_currentIndex > 0 && _lastWasWrong) {
-        setState(() { _currentIndex--; _lastWasWrong = false; });
+        setState(() {
+          _currentIndex--;
+          _lastWasWrong = false;
+        });
         SoundService().playKeyClick();
+        _scrollToCursor();
       }
       return;
     }
     if (char == null) return;
 
-    if (!_started) { _started = true; _startTimer(); }
+    if (!_started) {
+      _started = true;
+      _startTimer();
+    }
 
     if (_currentIndex >= _text.length) return;
     final expected = _text[_currentIndex];
@@ -224,14 +453,24 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
         _lastWasWrong = false;
         _correctStreak++;
       });
-      if (_correctStreak > 0 && _correctStreak % 20 == 0) SoundService().playStreak();
+
+      _scrollToCursor();
+
+      if (_correctStreak > 0 && _correctStreak % 20 == 0) {
+        SoundService().playStreak();
+      }
       // Generate more text if running low
       if (_currentIndex > _text.length - 50) {
         setState(() => _text += ' ${_generateText(100)}');
       }
     } else {
       SoundService().playError();
-      setState(() { _lastWasWrong = true; _errorCount++; _correctStreak = 0; });
+      setState(() {
+        _lastWasWrong = true;
+        _errorCount++;
+        _correctStreak = 0;
+      });
+      _scrollToCursor();
     }
   }
 
@@ -245,19 +484,28 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
   Widget build(BuildContext context) {
     final accuracy = _errorCount == 0 || _currentIndex == 0
         ? 100.0
-        : ((_currentIndex - _errorCount) / _currentIndex * 100).clamp(0.0, 100.0);
+        : ((_currentIndex - _errorCount) / _currentIndex * 100).clamp(
+            0.0,
+            100.0,
+          );
 
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         backgroundColor: AppTheme.surface,
         elevation: 0,
-        title: Text('TIMED CHALLENGE', style: AppTheme.heading(16, color: AppTheme.primary)),
+        title: Text(
+          'TIMED CHALLENGE',
+          style: AppTheme.heading(16, color: AppTheme.primary),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primary),
           onPressed: () => Navigator.pop(context),
         ),
-        bottom: PreferredSize(preferredSize: const Size.fromHeight(1), child: Container(height: 1, color: AppTheme.cardBorder)),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(height: 1, color: AppTheme.cardBorder),
+        ),
       ),
       body: KeyboardListener(
         focusNode: _focusNode,
@@ -269,7 +517,11 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
   }
 
   Widget _buildTypingView(double accuracy) {
-    final timerColor = _timerColor == 'danger' ? AppTheme.error : _timerColor == 'warning' ? AppTheme.error : AppTheme.primary;
+    final timerColor = _timerColor == 'danger'
+        ? AppTheme.error
+        : _timerColor == 'warning'
+        ? AppTheme.error
+        : AppTheme.primary;
 
     return Column(
       children: [
@@ -281,54 +533,110 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
             children: [
               // Duration pills
               if (!_started) ...[
-                ..._durations.asMap().entries.map((e) => Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: GestureDetector(
-                    onTap: () => _reset(_durations[e.key]),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: _selectedDuration == _durations[e.key] && !_isCustom ? AppTheme.primary.withValues(alpha: 0.15) : AppTheme.card,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: _selectedDuration == _durations[e.key] && !_isCustom ? AppTheme.primary : AppTheme.cardBorder),
+                ..._durations.asMap().entries.map(
+                  (e) => Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: GestureDetector(
+                      onTap: () => _reset(_durations[e.key]),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              _selectedDuration == _durations[e.key] &&
+                                  !_isCustom
+                              ? AppTheme.primary.withValues(alpha: 0.15)
+                              : AppTheme.card,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color:
+                                _selectedDuration == _durations[e.key] &&
+                                    !_isCustom
+                                ? AppTheme.primary
+                                : AppTheme.cardBorder,
+                          ),
+                        ),
+                        child: Text(
+                          _labels[e.key],
+                          style: AppTheme.body(
+                            12,
+                            color:
+                                _selectedDuration == _durations[e.key] &&
+                                    !_isCustom
+                                ? AppTheme.primary
+                                : AppTheme.textSecondary,
+                          ),
+                        ),
                       ),
-                      child: Text(_labels[e.key], style: AppTheme.body(12, color: _selectedDuration == _durations[e.key] && !_isCustom ? AppTheme.primary : AppTheme.textSecondary)),
                     ),
                   ),
-                )),
+                ),
                 // Custom time pill
                 GestureDetector(
                   onTap: _pickCustomTime,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 150),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: _isCustom ? AppTheme.lavender.withValues(alpha: 0.15) : AppTheme.card,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: _isCustom ? AppTheme.lavender : AppTheme.cardBorder),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
                     ),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(Icons.tune_rounded, size: 13, color: _isCustom ? AppTheme.lavender : AppTheme.textSecondary),
-                      const SizedBox(width: 5),
-                      Text(
-                        _isCustom ? _formatDuration(_selectedDuration) : 'Custom',
-                        style: AppTheme.body(12, color: _isCustom ? AppTheme.lavender : AppTheme.textSecondary),
+                    decoration: BoxDecoration(
+                      color: _isCustom
+                          ? AppTheme.lavender.withValues(alpha: 0.15)
+                          : AppTheme.card,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: _isCustom
+                            ? AppTheme.lavender
+                            : AppTheme.cardBorder,
                       ),
-                    ]),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.tune_rounded,
+                          size: 13,
+                          color: _isCustom
+                              ? AppTheme.lavender
+                              : AppTheme.textSecondary,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          _isCustom
+                              ? _formatDuration(_selectedDuration)
+                              : 'Custom',
+                          style: AppTheme.body(
+                            12,
+                            color: _isCustom
+                                ? AppTheme.lavender
+                                : AppTheme.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
               const Spacer(),
               // Big timer
               Text(
-                _timeLeft >= 60 ? '${_timeLeft ~/ 60}:${(_timeLeft % 60).toString().padLeft(2, '0')}' : '$_timeLeft',
+                _timeLeft >= 60
+                    ? '${_timeLeft ~/ 60}:${(_timeLeft % 60).toString().padLeft(2, '0')}'
+                    : '$_timeLeft',
                 style: AppTheme.heading(28, color: timerColor),
               ),
               const SizedBox(width: 24),
               _StatsChip('WPM', '$_wpm', AppTheme.primary),
               const SizedBox(width: 16),
-              _StatsChip('ACC', '${accuracy.toStringAsFixed(0)}%', AppTheme.gold),
+              _StatsChip(
+                'ACC',
+                '${accuracy.toStringAsFixed(0)}%',
+                AppTheme.gold,
+              ),
             ],
           ),
         ),
@@ -348,17 +656,31 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
               children: [
                 if (!_started)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: AppTheme.primary.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppTheme.primary.withValues(alpha: 0.2)),
+                      border: Border.all(
+                        color: AppTheme.primary.withValues(alpha: 0.2),
+                      ),
                     ),
-                    child: Row(children: [
-                      const Icon(Icons.timer_outlined, color: AppTheme.primary, size: 16),
-                      const SizedBox(width: 8),
-                      Text('Type as many words as you can before the timer runs out!', style: AppTheme.body(13, color: AppTheme.primary)),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.timer_outlined,
+                          color: AppTheme.primary,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Type as many words as you can before the timer runs out!',
+                          style: AppTheme.body(13, color: AppTheme.primary),
+                        ),
+                      ],
+                    ),
                   ),
                 if (!_started) const SizedBox(height: 16),
                 Expanded(child: _buildTextArea()),
@@ -377,31 +699,42 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
       decoration: BoxDecoration(
         color: AppTheme.card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _lastWasWrong ? AppTheme.error.withValues(alpha: 0.4) : AppTheme.cardBorder),
+        border: Border.all(
+          color: _lastWasWrong
+              ? AppTheme.error.withValues(alpha: 0.4)
+              : AppTheme.cardBorder,
+        ),
       ),
       child: SingleChildScrollView(
-        child: RichText(
-          text: TextSpan(
-            children: List.generate(min(_currentIndex + 80, _text.length), (i) {
-              Color color;
-              Color? bg;
-              if (i < _currentIndex) {
-                color = AppTheme.textSecondary.withValues(alpha: 0.4);
-              } else if (i == _currentIndex) {
-                color = _lastWasWrong ? AppTheme.error : AppTheme.textPrimary;
-                bg = _lastWasWrong ? AppTheme.error.withValues(alpha: 0.2) : AppTheme.primary.withValues(alpha: 0.2);
-              } else {
-                color = AppTheme.textPrimary;
-              }
-              return WidgetSpan(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 1),
-                  decoration: bg != null ? BoxDecoration(color: bg, borderRadius: BorderRadius.circular(3)) : null,
-                  child: Text(_text[i], style: AppTheme.mono(22, color: color)),
-                ),
-              );
-            }),
-          ),
+        controller: _scrollController,
+        child: Wrap(
+          children: List.generate(min(_currentIndex + 200, _text.length), (i) {
+            Color color;
+            Color? bg;
+            if (i < _currentIndex) {
+              color = AppTheme.textSecondary.withValues(alpha: 0.4);
+              bg = null;
+            } else if (i == _currentIndex) {
+              color = _lastWasWrong ? AppTheme.error : AppTheme.textPrimary;
+              bg = _lastWasWrong
+                  ? AppTheme.error.withValues(alpha: 0.2)
+                  : AppTheme.primary.withValues(alpha: 0.2);
+            } else {
+              color = AppTheme.textPrimary;
+              bg = null;
+            }
+            return Container(
+              key: i == _currentIndex ? _cursorKey : null,
+              padding: const EdgeInsets.symmetric(vertical: 1),
+              decoration: bg != null
+                  ? BoxDecoration(
+                      color: bg,
+                      borderRadius: BorderRadius.circular(3),
+                    )
+                  : null,
+              child: Text(_text[i], style: AppTheme.mono(22, color: color)),
+            );
+          }),
         ),
       ),
     );
@@ -427,16 +760,33 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
             children: [
               const Text('⏱️', style: TextStyle(fontSize: 52)),
               const SizedBox(height: 12),
-              Text('TIME\'S UP!', style: AppTheme.heading(28, color: AppTheme.primary)),
+              Text(
+                'TIME\'S UP!',
+                style: AppTheme.heading(28, color: AppTheme.primary),
+              ),
               const SizedBox(height: 24),
               // Stats grid
               Row(
                 children: [
-                  Expanded(child: _ResultStat('WPM', '$_wpm', AppTheme.primary)),
+                  Expanded(
+                    child: _ResultStat('WPM', '$_wpm', AppTheme.primary),
+                  ),
                   Container(width: 1, height: 50, color: AppTheme.cardBorder),
-                  Expanded(child: _ResultStat('ACCURACY', '${accuracy.toStringAsFixed(1)}%', AppTheme.gold)),
+                  Expanded(
+                    child: _ResultStat(
+                      'ACCURACY',
+                      '${accuracy.toStringAsFixed(1)}%',
+                      AppTheme.gold,
+                    ),
+                  ),
                   Container(width: 1, height: 50, color: AppTheme.cardBorder),
-                  Expanded(child: _ResultStat('WORDS', '$wordsTyped', AppTheme.success)),
+                  Expanded(
+                    child: _ResultStat(
+                      'WORDS',
+                      '$wordsTyped',
+                      AppTheme.success,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -447,27 +797,51 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
                   color: AppTheme.surface,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 child: WpmGraph(samples: _wpmSamples),
               ),
               const SizedBox(height: 24),
               Row(
                 children: [
-                  Expanded(child: OutlinedButton.icon(
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('AGAIN'),
-                    style: OutlinedButton.styleFrom(foregroundColor: AppTheme.textSecondary, side: const BorderSide(color: AppTheme.cardBorder), padding: const EdgeInsets.symmetric(vertical: 14)),
-                    onPressed: () => _reset(_selectedDuration, isCustom: _isCustom),
-                  )),
-                  const SizedBox(width: 12),
-                  ..._durations.where((d) => d != _selectedDuration || _isCustom).map((d) => Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16)),
-                      onPressed: () => _reset(d),
-                      child: Text(d >= 60 ? '${d ~/ 60}MIN' : '${d}s', style: AppTheme.body(13)),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('AGAIN'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppTheme.textSecondary,
+                        side: const BorderSide(color: AppTheme.cardBorder),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () =>
+                          _reset(_selectedDuration, isCustom: _isCustom),
                     ),
-                  )),
+                  ),
+                  const SizedBox(width: 12),
+                  ..._durations
+                      .where((d) => d != _selectedDuration || _isCustom)
+                      .map(
+                        (d) => Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 16,
+                              ),
+                            ),
+                            onPressed: () => _reset(d),
+                            child: Text(
+                              d >= 60 ? '${d ~/ 60}MIN' : '${d}s',
+                              style: AppTheme.body(13),
+                            ),
+                          ),
+                        ),
+                      ),
                 ],
               ),
             ],
@@ -479,25 +853,45 @@ class _TimedChallengeScreenState extends State<TimedChallengeScreen> with Ticker
 }
 
 class _StatsChip extends StatelessWidget {
-  final String label; final String val; final Color color;
+  final String label;
+  final String val;
+  final Color color;
   const _StatsChip(this.label, this.val, this.color);
   @override
-  Widget build(BuildContext ctx) => Row(children: [
-    Text(label, style: AppTheme.body(11, color: AppTheme.textMuted).copyWith(letterSpacing: 1)),
-    const SizedBox(width: 5),
-    Text(val, style: AppTheme.heading(16, color: color)),
-  ]);
+  Widget build(BuildContext ctx) => Row(
+    children: [
+      Text(
+        label,
+        style: AppTheme.body(
+          11,
+          color: AppTheme.textMuted,
+        ).copyWith(letterSpacing: 1),
+      ),
+      const SizedBox(width: 5),
+      Text(val, style: AppTheme.heading(16, color: color)),
+    ],
+  );
 }
 
 class _ResultStat extends StatelessWidget {
-  final String label; final String val; final Color color;
+  final String label;
+  final String val;
+  final Color color;
   const _ResultStat(this.label, this.val, this.color);
   @override
-  Widget build(BuildContext ctx) => Column(children: [
-    Text(val, style: AppTheme.heading(26, color: color)),
-    const SizedBox(height: 4),
-    Text(label, style: AppTheme.body(11, color: AppTheme.textSecondary).copyWith(letterSpacing: 1)),
-  ]);
+  Widget build(BuildContext ctx) => Column(
+    children: [
+      Text(val, style: AppTheme.heading(26, color: color)),
+      const SizedBox(height: 4),
+      Text(
+        label,
+        style: AppTheme.body(
+          11,
+          color: AppTheme.textSecondary,
+        ).copyWith(letterSpacing: 1),
+      ),
+    ],
+  );
 }
 
 // ── Custom Time Picker Dialog ──────────────────────────────────────────────
@@ -547,17 +941,29 @@ class _CustomTimeDialogState extends State<_CustomTimeDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: AppTheme.lavender.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
-                child: Icon(Icons.tune_rounded, color: AppTheme.lavender, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text('Custom Time', style: AppTheme.heading(18)),
-            ]),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.lavender.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.tune_rounded,
+                    color: AppTheme.lavender,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text('Custom Time', style: AppTheme.heading(18)),
+              ],
+            ),
             const SizedBox(height: 6),
-            Text('Set your own practice duration.', style: AppTheme.body(13, color: AppTheme.textSecondary)),
+            Text(
+              'Set your own practice duration.',
+              style: AppTheme.body(13, color: AppTheme.textSecondary),
+            ),
             const SizedBox(height: 24),
 
             // Minutes picker
@@ -587,55 +993,73 @@ class _CustomTimeDialogState extends State<_CustomTimeDialog> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: _valid ? AppTheme.lavender.withValues(alpha: 0.1) : AppTheme.error.withValues(alpha: 0.06),
+                color: _valid
+                    ? AppTheme.lavender.withValues(alpha: 0.1)
+                    : AppTheme.error.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: _valid ? AppTheme.lavender.withValues(alpha: 0.4) : AppTheme.error.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: _valid
+                      ? AppTheme.lavender.withValues(alpha: 0.4)
+                      : AppTheme.error.withValues(alpha: 0.3),
+                ),
               ),
-              child: Column(children: [
-                Text(
-                  _valid ? _preview : 'Too short',
-                  style: AppTheme.heading(26, color: _valid ? AppTheme.lavender : AppTheme.error),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  _valid ? 'duration selected' : 'minimum is 10 seconds',
-                  style: AppTheme.body(11, color: AppTheme.textSecondary),
-                  textAlign: TextAlign.center,
-                ),
-              ]),
+              child: Column(
+                children: [
+                  Text(
+                    _valid ? _preview : 'Too short',
+                    style: AppTheme.heading(
+                      26,
+                      color: _valid ? AppTheme.lavender : AppTheme.error,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    _valid ? 'duration selected' : 'minimum is 10 seconds',
+                    style: AppTheme.body(11, color: AppTheme.textSecondary),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
 
-            Row(children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.textSecondary,
-                    side: const BorderSide(color: AppTheme.cardBorder),
-                    padding: const EdgeInsets.symmetric(vertical: 13),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.textSecondary,
+                      side: const BorderSide(color: AppTheme.cardBorder),
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                    ),
+                    child: Text('Cancel', style: AppTheme.body(14)),
                   ),
-                  child: Text('Cancel', style: AppTheme.body(14)),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _valid ? () {
-                    Navigator.pop(context);
-                    widget.onConfirm(_minutes, _seconds);
-                  } : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.lavender,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                    disabledBackgroundColor: AppTheme.cardBorder,
-                    elevation: 0,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _valid
+                        ? () {
+                            Navigator.pop(context);
+                            widget.onConfirm(_minutes, _seconds);
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.lavender,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      disabledBackgroundColor: AppTheme.cardBorder,
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Start',
+                      style: AppTheme.body(14, weight: FontWeight.bold),
+                    ),
                   ),
-                  child: Text('Start', style: AppTheme.body(14, weight: FontWeight.bold)),
                 ),
-              ),
-            ]),
+              ],
+            ),
           ],
         ),
       ),
@@ -661,33 +1085,41 @@ class _PickerRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      SizedBox(width: 72, child: Text(label, style: AppTheme.body(14, color: AppTheme.textSecondary))),
-      const Spacer(),
-      // Decrement
-      _StepBtn(
-        icon: Icons.remove_rounded,
-        enabled: value > min,
-        onTap: () => onChanged((value - step).clamp(min, max)),
-      ),
-      const SizedBox(width: 16),
-      // Value display
-      SizedBox(
-        width: 52,
-        child: Text(
-          value.toString().padLeft(2, '0'),
-          style: AppTheme.heading(28, color: AppTheme.textPrimary),
-          textAlign: TextAlign.center,
+    return Row(
+      children: [
+        SizedBox(
+          width: 72,
+          child: Text(
+            label,
+            style: AppTheme.body(14, color: AppTheme.textSecondary),
+          ),
         ),
-      ),
-      const SizedBox(width: 16),
-      // Increment
-      _StepBtn(
-        icon: Icons.add_rounded,
-        enabled: value < max,
-        onTap: () => onChanged((value + step).clamp(min, max)),
-      ),
-    ]);
+        const Spacer(),
+        // Decrement
+        _StepBtn(
+          icon: Icons.remove_rounded,
+          enabled: value > min,
+          onTap: () => onChanged((value - step).clamp(min, max)),
+        ),
+        const SizedBox(width: 16),
+        // Value display
+        SizedBox(
+          width: 52,
+          child: Text(
+            value.toString().padLeft(2, '0'),
+            style: AppTheme.heading(28, color: AppTheme.textPrimary),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(width: 16),
+        // Increment
+        _StepBtn(
+          icon: Icons.add_rounded,
+          enabled: value < max,
+          onTap: () => onChanged((value + step).clamp(min, max)),
+        ),
+      ],
+    );
   }
 }
 
@@ -695,20 +1127,35 @@ class _StepBtn extends StatelessWidget {
   final IconData icon;
   final bool enabled;
   final VoidCallback onTap;
-  const _StepBtn({required this.icon, required this.enabled, required this.onTap});
+  const _StepBtn({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) => GestureDetector(
     onTap: enabled ? onTap : null,
     child: AnimatedContainer(
       duration: const Duration(milliseconds: 120),
-      width: 38, height: 38,
+      width: 38,
+      height: 38,
       decoration: BoxDecoration(
-        color: enabled ? AppTheme.primary.withValues(alpha: 0.1) : AppTheme.background,
+        color: enabled
+            ? AppTheme.primary.withValues(alpha: 0.1)
+            : AppTheme.background,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: enabled ? AppTheme.primary.withValues(alpha: 0.3) : AppTheme.cardBorder),
+        border: Border.all(
+          color: enabled
+              ? AppTheme.primary.withValues(alpha: 0.3)
+              : AppTheme.cardBorder,
+        ),
       ),
-      child: Icon(icon, size: 20, color: enabled ? AppTheme.primary : AppTheme.textMuted),
+      child: Icon(
+        icon,
+        size: 20,
+        color: enabled ? AppTheme.primary : AppTheme.textMuted,
+      ),
     ),
   );
 }
