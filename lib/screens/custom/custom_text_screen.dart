@@ -142,20 +142,27 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) return;
 
     String? char;
-    if (event.character != null && event.character!.isNotEmpty) {
-      char = event.character!;
-    } else if (event.logicalKey == LogicalKeyboardKey.space) {
-      char = ' ';
-    } else if (event.logicalKey == LogicalKeyboardKey.enter) {
-      // Enter treated as a space (handles paragraph transitions)
-      char = ' ';
-    } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
+
+    if (event.logicalKey == LogicalKeyboardKey.backspace) {
       if (_currentIndex > 0 && _lastWasWrong) {
         setState(() { _currentIndex--; _lastWasWrong = false; });
         _scrollToCursor();
       }
       return;
+    } else if (event.logicalKey == LogicalKeyboardKey.enter) {
+      char = ' '; // paragraph transition
+    } else if (event.logicalKey == LogicalKeyboardKey.space) {
+      char = ' ';
+    } else if (event.character != null && event.character!.isNotEmpty) {
+      // Primary source — works for letters, numbers
+      char = event.character!;
+    } else {
+      // Fallback for symbols that event.character misses (apostrophe, quotes,
+      // brackets, etc.) — keyLabel gives the raw key string e.g. "'" ";" "["
+      final label = event.logicalKey.keyLabel;
+      if (label.length == 1) char = label;
     }
+
     if (char == null) return;
 
     if (!_started) {
