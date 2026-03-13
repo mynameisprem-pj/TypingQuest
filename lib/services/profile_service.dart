@@ -46,6 +46,21 @@ class ProfileService {
   UserProfile? get activeProfile => _activeProfile;
   bool get hasProfile => _activeProfile != null;
 
+  /// True when the current profile is the auto-created guest (not a real student)
+  bool get isGuest => _activeProfile?.id == 'guest';
+
+  /// Called on startup when no saved profile exists.
+  /// Creates a lightweight in-memory Guest profile — nothing written to storage.
+  void ensureGuestProfile() {
+    _activeProfile ??= UserProfile(
+        id: 'guest',
+        name: 'Guest',
+        className: '',
+        avatar: '👤',
+        createdAt: DateTime.now(),
+      );
+  }
+
   /// Lazily ensures _prefs is ready — called by every method so they all
   /// work even if called before init() or if init() partially failed.
   Future<SharedPreferences> _getPrefs() async {

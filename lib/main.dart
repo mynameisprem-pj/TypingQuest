@@ -6,7 +6,6 @@ import 'services/stats_service.dart';
 import 'services/achievements_service.dart';
 import 'services/sound_service.dart';
 import 'screens/home/home_screen.dart';
-import 'screens/profile/profile_select_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +14,11 @@ void main() async {
   await StatsService().init();
   await AchievementsService().init();
   await SoundService().init();
+
+  // If no saved profile exists, silently create a Guest profile in memory.
+  // Users go straight to the home screen — no forced sign-up on first visit.
+  ProfileService().ensureGuestProfile();
+
   runApp(const TypingQuestApp());
 }
 
@@ -27,9 +31,7 @@ class TypingQuestApp extends StatelessWidget {
       title: 'TypingQuest',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
-      home: ProfileService().hasProfile
-          ? const HomeScreen()
-          : const ProfileSelectScreen(),
+      home: const HomeScreen(), // always HomeScreen — guest or real profile
     );
   }
 }

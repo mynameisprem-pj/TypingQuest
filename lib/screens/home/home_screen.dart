@@ -68,27 +68,40 @@ class _HomeScreenState extends State<HomeScreen> {
           Text('TypingQuest', style: AppTheme.heading(17, color: AppTheme.textPrimary)),
         ]),
         actions: [
-          // Profile avatar
+          // Profile avatar / guest badge
           if (profile != null)
             Padding(
               padding: const EdgeInsets.only(right: 4),
               child: GestureDetector(
                 onTap: () async {
-                  final switched = await Navigator.push<bool>(context, MaterialPageRoute(builder: (_) => const ProfileSelectScreen(switchMode: true)));
+                  final switched = await Navigator.push<bool>(context,
+                      MaterialPageRoute(builder: (_) => const ProfileSelectScreen(switchMode: true)));
                   if (switched == true && mounted) setState(() {});
                 },
                 child: Container(
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppTheme.background,
+                    color: ProfileService().isGuest
+                        ? AppTheme.gold.withValues(alpha: 0.12)
+                        : AppTheme.background,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppTheme.cardBorder),
+                    border: Border.all(
+                      color: ProfileService().isGuest
+                          ? AppTheme.gold.withValues(alpha: 0.5)
+                          : AppTheme.cardBorder,
+                    ),
                   ),
                   child: Row(children: [
                     Text(profile.avatar, style: const TextStyle(fontSize: 16)),
                     const SizedBox(width: 5),
-                    Text(profile.name, style: AppTheme.body(12, color: AppTheme.textSecondary)),
+                    Text(
+                      ProfileService().isGuest ? 'Guest' : profile.name,
+                      style: AppTheme.body(12,
+                          color: ProfileService().isGuest
+                              ? AppTheme.gold
+                              : AppTheme.textSecondary),
+                    ),
                   ]),
                 ),
               ),
@@ -110,8 +123,18 @@ class _HomeScreenState extends State<HomeScreen> {
       // ── Navigation Drawer ────────────────────────────────────────────────
       drawer: _buildDrawer(context),
 
-      // ── Body — The Falling Words Game ────────────────────────────────────
-      body: const FallingWordsGame(),
+      // ── Body ────────────────────────────────────────────────────────────
+      body: Column(
+        children: [
+          // Guest banner — only shown when no real profile exists
+          if (ProfileService().isGuest) _GuestBanner(onCreateProfile: () async {
+            final created = await Navigator.push<bool>(context,
+                MaterialPageRoute(builder: (_) => const ProfileSelectScreen()));
+            if (created == true && mounted) setState(() {});
+          }),
+          const Expanded(child: FallingWordsGame()),
+        ],
+      ),
     );
   }
 
@@ -151,10 +174,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text('TypingQuest', style: AppTheme.heading(22, color: AppTheme.textPrimary)),
-                  if (profile != null) ...[
+                  if (profile != null && !ProfileService().isGuest) ...[
                     const SizedBox(height: 4),
                     Text('${profile.avatar}  ${profile.name}  ·  ${profile.className}',
                         style: AppTheme.body(13, color: AppTheme.textSecondary)),
+                  ],
+                  if (ProfileService().isGuest) ...[
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: () async {
+                        Navigator.pop(context);
+                        final created = await Navigator.push<bool>(context,
+                            MaterialPageRoute(builder: (_) => const ProfileSelectScreen()));
+                        if (created == true && mounted) setState(() {});
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primary.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppTheme.primary.withValues(alpha: 0.4)),
+                        ),
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          const Icon(Icons.person_add_outlined, size: 14, color: AppTheme.primary),
+                          const SizedBox(width: 6),
+                          Text('Create Profile to save progress',
+                              style: AppTheme.body(12, color: AppTheme.primary)),
+                        ]),
+                      ),
+                    ),
                   ],
                 ],
               ),
@@ -194,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               child: Text(
-                'Learn with fun !',
+                'Mahadev Janta Secondary School\nClass 6 · 7 · 8',
                 style: AppTheme.body(11, color: AppTheme.textMuted),
                 textAlign: TextAlign.center,
               ),
@@ -302,7 +350,6 @@ class _SettingsSheetState extends State<_SettingsSheet> {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-      child: SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,12 +413,12 @@ class _SettingsSheetState extends State<_SettingsSheet> {
 
           _SettingLabel('APP'),
           const SizedBox(height: 8),
-          // _SettingRow(
-          //   icon: Icons.school_outlined,
-          //   iconColor: AppTheme.primary,
-          //   title: 'School',
-          //   subtitle: 'Mahadev Janta Secondary School',
-          // ),
+          _SettingRow(
+            icon: Icons.school_outlined,
+            iconColor: AppTheme.primary,
+            title: 'School',
+            subtitle: 'Mahadev Janta Secondary School',
+          ),
           const SizedBox(height: 6),
           _SettingRow(
             icon: Icons.info_outline,
@@ -381,7 +428,50 @@ class _SettingsSheetState extends State<_SettingsSheet> {
           ),
         ],
       ),
-      )
+    );
+  }
+}
+
+// ── Guest Banner ──────────────────────────────────────────────────────────────
+class _GuestBanner extends StatelessWidget {
+  final VoidCallback onCreateProfile;
+  const _GuestBanner({required this.onCreateProfile});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppTheme.gold.withValues(alpha: 0.08),
+        border: Border(bottom: BorderSide(color: AppTheme.gold.withValues(alpha: 0.25))),
+      ),
+      child: Row(children: [
+        const Text('👤', style: TextStyle(fontSize: 15)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            'Browsing as Guest — progress won\'t be saved',
+            style: AppTheme.body(12, color: AppTheme.gold),
+          ),
+        ),
+        const SizedBox(width: 8),
+        GestureDetector(
+          onTap: onCreateProfile,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppTheme.gold,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              'Create Profile',
+              style: AppTheme.body(11,
+                  color: Colors.white, weight: FontWeight.bold),
+            ),
+          ),
+        ),
+      ]),
     );
   }
 }
