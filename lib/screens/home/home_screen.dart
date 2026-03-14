@@ -242,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               child: Text(
-                'Mahadev Janta Secondary School\nClass 6 · 7 · 8',
+                'Learn with fun 😎',
                 style: AppTheme.body(11, color: AppTheme.textMuted),
                 textAlign: TextAlign.center,
               ),
@@ -350,6 +350,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+      child: SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -412,13 +413,13 @@ class _SettingsSheetState extends State<_SettingsSheet> {
           const SizedBox(height: 20),
 
           _SettingLabel('APP'),
-          const SizedBox(height: 8),
-          _SettingRow(
-            icon: Icons.school_outlined,
-            iconColor: AppTheme.primary,
-            title: 'School',
-            subtitle: 'Mahadev Janta Secondary School',
-          ),
+          // const SizedBox(height: 8),
+          // _SettingRow(
+          //   icon: Icons.school_outlined,
+          //   iconColor: AppTheme.primary,
+          //   title: 'School',
+          //   subtitle: 'Mahadev Janta Secondary School',
+          // ),
           const SizedBox(height: 6),
           _SettingRow(
             icon: Icons.info_outline,
@@ -428,6 +429,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
           ),
         ],
       ),
+      )
     );
   }
 }
