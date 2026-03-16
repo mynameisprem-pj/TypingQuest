@@ -784,48 +784,46 @@ class _FallingWordsGameState extends State<FallingWordsGame> with TickerProvider
   }
 
   // ── On-screen keyboard widget ──────────────────────────────────────────
-  Widget _buildOsk() {
-    final screenW = MediaQuery.of(context).size.width;
-    final availW  = screenW - 16.0;
-    // Widest row = 10 keys + 9 gaps of 5px
-    final keyW    = (availW - 9 * 5) / 10;
-    const keyH    = 44.0;
+Widget _buildOsk() {
+  const keyH = 44.0;
 
-    return Container(
-      color: const Color(0xFFF0F2F7),
-      padding: const EdgeInsets.fromLTRB(8, 6, 8, 10),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: _kKeyRows.map((row) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: row.map((key) {
-                final isBackspace = key == '⌫';
-                final isSpace     = key == 'SPACE';
-                final w = isSpace
-                    ? keyW * 4 + 3 * 5
-                    : isBackspace
-                        ? keyW * 1.5
-                        : keyW;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2.5),
+  return Container(
+    color: const Color(0xFFF0F2F7),
+    padding: const EdgeInsets.fromLTRB(8, 6, 8, 10),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: _kKeyRows.map((row) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Row(
+            children: row.map((key) {
+              final isBackspace = key == '⌫';
+              final isSpace = key == 'SPACE';
+
+              int flex = 1;
+              if (isBackspace) flex = 2;
+              if (isSpace) flex = 5;
+
+              return Expanded(
+                flex: flex,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
                   child: _OskKey(
                     label: key,
-                    width: w,
                     height: keyH,
+                    width: double.infinity,
                     onTap: () => _handleOskKey(key),
                     isSpecial: isBackspace || isSpace,
                   ),
-                );
-              }).toList(),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      }).toList(),
+    ),
+  );
+}
 
   void _setDifficulty(WordRainDifficulty d) {
     setState(() => _difficulty = d);
