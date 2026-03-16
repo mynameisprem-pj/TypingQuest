@@ -57,6 +57,13 @@ const _kDiffConfig = {
   WordRainDifficulty.hard:   {'spawnMs': 1200, 'speedMin': 100.0, 'speedMax': 160.0, 'maxWords': 10},
 };
 
+// ── On-screen keyboard layout (mobile only) ───────────────────────────────
+const List<List<String>> _kKeyRows = [
+  ['q','w','e','r','t','y','u','i','o','p'],
+  ['a','s','d','f','g','h','j','k','l'],
+  ['⌫','z','x','c','v','b','n','m','SPACE'],
+];
+
 // ══════════════════════════════════════════════════════════════════════════
 class FallingWordsGame extends StatefulWidget {
   const FallingWordsGame({super.key});
@@ -102,6 +109,15 @@ class _FallingWordsGameState extends State<FallingWordsGame> with TickerProvider
 
   // Score pop
   final List<_ScorePop> _scorePops = [];
+
+  // ── Mobile detection ──────────────────────────────────────────────────
+  /// True on iOS/Android — show on-screen keyboard instead of physical one.
+  bool get _isMobile =>
+      Theme.of(context).platform == TargetPlatform.iOS ||
+      Theme.of(context).platform == TargetPlatform.android;
+
+  /// Extra height added to the bottom bar when OSK is shown.
+  static const double _oskExtraHeight = 44.0 * 3 + 6.0 * 3 + 12.0 * 2; // ≈ 180
 
   @override
   void initState() {
@@ -255,7 +271,7 @@ class _FallingWordsGameState extends State<FallingWordsGame> with TickerProvider
 
     if (!mounted) return;
     final screenH = MediaQuery.of(context).size.height;
-    final groundY = screenH - 130; // bottom typing bar area
+    final groundY = screenH - 130 - (_isMobile ? _oskExtraHeight : 0); // bottom typing bar area
 
     setState(() {
       // Update WPM
@@ -392,6 +408,56 @@ class _FallingWordsGameState extends State<FallingWordsGame> with TickerProvider
     });
   }
 
+  // ── On-screen keyboard input (mobile only) ────────────────────────────
+  void _handleOskKey(String key) {
+    if (_paused || _gameOver || !_started) return;
+
+    if (key == '⌫') {
+      if (_currentInput.isEmpty) return;
+      setState(() {
+        _currentInput = _currentInput.substring(0, _currentInput.length - 1);
+        _updateTarget();
+      });
+      return;
+    }
+
+    if (key == 'SPACE') {
+      setState(() {
+        _currentInput = '';
+        _lockedTarget = null;
+        for (final w in _words) { w.matched = false; }
+      });
+      return;
+    }
+
+    // Normal letter — reuse the same logic as the physical keyboard handler
+    final char = key.toLowerCase();
+    setState(() {
+      _currentInput += char;
+
+      if (_lockedTarget != null && !_lockedTarget!.dying) {
+        final target = _lockedTarget!;
+        if (target.text.toLowerCase().startsWith(_currentInput)) {
+          if (target.text.toLowerCase() == _currentInput) {
+            _destroyWord(target);
+            _clearInput();
+          }
+        } else {
+          _currentInput = char;
+          _lockedTarget = null;
+          _updateTarget();
+        }
+      } else {
+        _lockedTarget = null;
+        _updateTarget();
+        if (_lockedTarget != null && _lockedTarget!.text.toLowerCase() == _currentInput) {
+          _destroyWord(_lockedTarget!);
+          _clearInput();
+        }
+      }
+    });
+  }
+
   /// Finds the best word to target from current input.
   /// Priority: exact match first, then longest prefix match,
   /// then among ties — the word closest to the ground (highest y).
@@ -450,7 +516,7 @@ class _FallingWordsGameState extends State<FallingWordsGame> with TickerProvider
     int base = w.text.length * 10;
     // Bonus for speed (word close to bottom = higher risk = more points)
     final screenH = MediaQuery.of(context).size.height;
-    final groundY = screenH - 130.0;
+    final groundY = screenH - 130.0 - (_isMobile ? _oskExtraHeight : 0);
     final danger = (w.y / groundY).clamp(0.0, 1.0);
     return base + (base * danger * 0.5).round();
   }
@@ -499,7 +565,7 @@ class _FallingWordsGameState extends State<FallingWordsGame> with TickerProvider
 
         // ── Ground line ─────────────────────────────────────────────────
         Positioned(
-          bottom: 128,
+          bottom: 128 + (_isMobile ? _oskExtraHeight : 0),
           left: 0, right: 0,
           child: Container(
             height: 2,
@@ -637,7 +703,11 @@ class _FallingWordsGameState extends State<FallingWordsGame> with TickerProvider
         border: Border(top: BorderSide(color: AppTheme.cardBorder)),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 12, offset: const Offset(0, -4))],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // ── Original input row (unchanged) ────────────────────────────
+          Row(
         children: [
           // Visual input display — looks like a text field but IS NOT one
           Expanded(
@@ -660,7 +730,9 @@ class _FallingWordsGameState extends State<FallingWordsGame> with TickerProvider
                   Expanded(
                     child: _currentInput.isEmpty
                         ? Text(
-                            'Just start typing — no clicking needed...',
+                            _isMobile
+                                ? 'Tap keys below to type...'
+                                : 'Just start typing — no clicking needed...',
                             style: AppTheme.body(14, color: AppTheme.textMuted),
                           )
                         : Row(children: [
@@ -703,6 +775,54 @@ class _FallingWordsGameState extends State<FallingWordsGame> with TickerProvider
             ]),
           ),
         ],
+      ),
+          // ── On-screen keyboard (mobile only) ─────────────────────────
+          if (_isMobile) _buildOsk(),
+        ],
+      ),
+    );
+  }
+
+  // ── On-screen keyboard widget ──────────────────────────────────────────
+  Widget _buildOsk() {
+    final screenW = MediaQuery.of(context).size.width;
+    final availW  = screenW - 16.0;
+    // Widest row = 10 keys + 9 gaps of 5px
+    final keyW    = (availW - 9 * 5) / 10;
+    const keyH    = 44.0;
+
+    return Container(
+      color: const Color(0xFFF0F2F7),
+      padding: const EdgeInsets.fromLTRB(8, 6, 8, 10),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: _kKeyRows.map((row) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: row.map((key) {
+                final isBackspace = key == '⌫';
+                final isSpace     = key == 'SPACE';
+                final w = isSpace
+                    ? keyW * 4 + 3 * 5
+                    : isBackspace
+                        ? keyW * 1.5
+                        : keyW;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2.5),
+                  child: _OskKey(
+                    label: key,
+                    width: w,
+                    height: keyH,
+                    onTap: () => _handleOskKey(key),
+                    isSpecial: isBackspace || isSpace,
+                  ),
+                );
+              }).toList(),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -879,6 +999,75 @@ class _ScorePop {
   double y;
   double opacity;
   _ScorePop({required this.text, required this.x, required this.y, required this.opacity});
+}
+
+// ── On-screen keyboard key widget ──────────────────────────────────────────
+class _OskKey extends StatefulWidget {
+  final String label;
+  final double width, height;
+  final VoidCallback onTap;
+  final bool isSpecial;
+  const _OskKey({
+    required this.label,
+    required this.width,
+    required this.height,
+    required this.onTap,
+    this.isSpecial = false,
+  });
+
+  @override
+  State<_OskKey> createState() => _OskKeyState();
+}
+
+class _OskKeyState extends State<_OskKey> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) { setState(() => _pressed = false); widget.onTap(); },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 80),
+        width: widget.width,
+        height: widget.height,
+        decoration: BoxDecoration(
+          color: _pressed
+              ? AppTheme.primary.withValues(alpha: 0.18)
+              : widget.isSpecial
+                  ? const Color(0xFFDDE1EC)
+                  : Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: _pressed
+                ? AppTheme.primary.withValues(alpha: 0.5)
+                : const Color(0xFFCDD1DC),
+            width: _pressed ? 1.5 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: _pressed ? 0.04 : 0.10),
+              blurRadius: _pressed ? 1 : 3,
+              offset: Offset(0, _pressed ? 0 : 2),
+            ),
+          ],
+        ),
+        child: Center(
+          child: widget.label == 'SPACE'
+              ? const Icon(Icons.space_bar, size: 18, color: AppTheme.textSecondary)
+              : widget.label == '⌫'
+                  ? const Icon(Icons.backspace_outlined, size: 16, color: AppTheme.textSecondary)
+                  : Text(
+                      widget.label,
+                      style: AppTheme.mono(14, color: widget.isSpecial
+                          ? AppTheme.textSecondary
+                          : AppTheme.textPrimary).copyWith(fontWeight: FontWeight.w600),
+                    ),
+        ),
+      ),
+    );
+  }
 }
 
 // ── Animated background (gentle floating shapes) ───────────────────────────
