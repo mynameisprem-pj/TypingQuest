@@ -454,7 +454,7 @@ class _GuestBanner extends StatelessWidget {
         Expanded(
           child: Text(
             'Browsing as Guest — progress won\'t be saved',
-            style: AppTheme.body(12, color: AppTheme.gold),
+            style: AppTheme.body(12, color: const Color.fromARGB(255, 45, 190, 52)),
           ),
         ),
         const SizedBox(width: 8),
@@ -463,13 +463,13 @@ class _GuestBanner extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppTheme.gold,
+              color: const Color.fromARGB(255, 187, 67, 75),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
               'Create Profile',
               style: AppTheme.body(11,
-                  color: Colors.white, weight: FontWeight.bold),
+                  color: const Color.fromARGB(255, 255, 255, 255), weight: FontWeight.bold),
             ),
           ),
         ),
