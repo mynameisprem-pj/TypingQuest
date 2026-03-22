@@ -515,8 +515,24 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
                     color: AppTheme.cardBorder,
                   ),
                   const SizedBox(width: 8),
-                  Text('¶',
-                      style: AppTheme.body(12, color: AppTheme.textMuted)),
+                  Container(
+                    key: isCurrent ? _cursorKey : null,
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    decoration: isCurrent
+                        ? BoxDecoration(
+                            color: _lastWasWrong
+                                ? AppTheme.error.withValues(alpha: 0.18)
+                                : _accent.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(3))
+                        : null,
+                    child: Text('¶',
+                        style: AppTheme.body(12,
+                            color: isCurrent
+                                ? (_lastWasWrong
+                                    ? AppTheme.error
+                                    : AppTheme.textPrimary)
+                                : AppTheme.textMuted)),
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                       child: Container(height: 1, color: AppTheme.cardBorder)),
