@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProfile {
@@ -82,10 +83,10 @@ class ProfileService {
       }
     } on FormatException catch (e) {
       // Corrupted SharedPreferences data — wipe it so next launch is clean
-      print('ProfileService: corrupted data detected, clearing. ($e)');
+      developer.log('ProfileService: corrupted data detected, clearing. ($e)');
       await clearCorruptedData();
     } catch (e) {
-      print('ProfileService init warning: $e');
+      developer.log('ProfileService init warning: $e');
     }
   }
 
@@ -101,7 +102,7 @@ class ProfileService {
         }
       } catch (e) {
         // Skip corrupted entries — one bad record won't crash the whole app
-        print('ProfileService: skipping corrupted profile entry: $e');
+        developer.log('ProfileService: skipping corrupted profile entry: $e');
       }
     }
     return profiles;
@@ -167,6 +168,10 @@ class ProfileService {
     _activeProfile = null;
   }
 
-  String get keyPrefix =>
-      _activeProfile != null ? 'p_${_activeProfile!.id}_' : '';
+  /// Returns empty string for guests so no data is written to SharedPreferences.
+  /// Real profiles get their own isolated key namespace e.g. 'p_1234567_'.
+  String get keyPrefix {
+    if (_activeProfile == null || isGuest) return '';
+    return 'p_${_activeProfile!.id}_';
+  }
 }

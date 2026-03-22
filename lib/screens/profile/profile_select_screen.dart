@@ -154,9 +154,14 @@ class _ProfileSelectScreenState extends State<ProfileSelectScreen> {
 
   void _back() {
     if (_mode != _Mode.list) {
-      setState(() => _mode = _Mode.list);
-    } else if (widget.switchMode) {
-      Navigator.pop(context);
+      if (_profiles.isEmpty) {
+        // Guest pressed cancel on create form — go back to home
+        Navigator.pop(context, false);
+      } else {
+        setState(() => _mode = _Mode.list);
+      }
+    } else if (widget.switchMode || ProfileService().isGuest) {
+      Navigator.pop(context, false);
     }
   }
 
@@ -196,8 +201,8 @@ class _ProfileSelectScreenState extends State<ProfileSelectScreen> {
               Text('Quest', style: AppTheme.heading(34, color: AppTheme.gold)),
             ]),
             const SizedBox(height: 4),
-            // Text('Mahadev Janta Secondary School',
-            //     style: AppTheme.body(13, color: AppTheme.textSecondary)),
+            Text('Mahadev Janta Secondary School',
+                style: AppTheme.body(13, color: AppTheme.textSecondary)),
             const SizedBox(height: 36),
 
             // Section label
@@ -276,9 +281,11 @@ class _ProfileSelectScreenState extends State<ProfileSelectScreen> {
             boxShadow: AppTheme.cardShadow,
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // Header row
+            // ── Header row ──────────────────────────────────────────────
             Row(children: [
-              if (_profiles.isNotEmpty)
+              // Show back arrow if there are real profiles to go back to,
+              // OR if guest (always allow escape from the create form)
+              if (_profiles.isNotEmpty || ProfileService().isGuest)
                 GestureDetector(
                   onTap: _back,
                   child: Container(
@@ -291,7 +298,7 @@ class _ProfileSelectScreenState extends State<ProfileSelectScreen> {
                     child: const Icon(Icons.arrow_back_ios_rounded, size: 15, color: AppTheme.textSecondary),
                   ),
                 ),
-              if (_profiles.isNotEmpty) const SizedBox(width: 12),
+              if (_profiles.isNotEmpty || ProfileService().isGuest) const SizedBox(width: 12),
               Expanded(child: Text(isEdit ? 'Edit Profile' : 'New Profile', style: AppTheme.heading(22))),
             ]),
             const SizedBox(height: 4),
@@ -388,6 +395,21 @@ class _ProfileSelectScreenState extends State<ProfileSelectScreen> {
                 onPressed: canSubmit ? (isEdit ? _submitEdit : _submitCreate) : null,
               ),
             ),
+
+            // Cancel / Maybe later — always visible so user is never trapped
+            if (!isEdit) ...[
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: _back,
+                  child: Text(
+                    ProfileService().isGuest ? 'Maybe Later' : 'Cancel',
+                    style: AppTheme.body(13, color: AppTheme.textSecondary),
+                  ),
+                ),
+              ),
+            ],
           ]),
         ),
       ),
