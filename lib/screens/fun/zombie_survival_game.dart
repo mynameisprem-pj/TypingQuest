@@ -258,6 +258,8 @@ class _ZombieSurvivalGameState extends State<ZombieSurvivalGame>
 
   // ── Layout ────────────────────────────────────────────────────────────────
   double _screenW = 900, _screenH = 600;
+  double get _uiScale => min(_screenW, _screenH) / 600.0;
+  double get _fontScale => _uiScale.clamp(0.7, 1.35);
   static const double _baseX = 90.0;
 
   final FocusNode _focus = FocusNode();
@@ -876,13 +878,15 @@ class _ZombieSurvivalGameState extends State<ZombieSurvivalGame>
     return Stack(
       children: _zombies.map((z) {
         final typed = z == _locked ? _typed : '';
+        final enemyW = (90 * _uiScale).clamp(52, 120).toDouble();
+        final enemyH = (100 * _uiScale).clamp(60, 140).toDouble();
         return Positioned(
-          left: z.x - 45,
-          top: z.y - 70,
+          left: z.x - enemyW / 2,
+          top: z.y - enemyH * 0.68,
           child: Opacity(
             opacity: z.opacity.clamp(0, 1),
             child: SizedBox(
-              width: 90,
+              width: enemyW,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -890,7 +894,7 @@ class _ZombieSurvivalGameState extends State<ZombieSurvivalGame>
                   AnimatedBuilder(
                     animation: _pulseCtrl,
                     builder: (_, _) => CustomPaint(
-                      size: const Size(90, 100),
+                      size: Size(enemyW, enemyH),
                       painter: _ZombiePainter(z, _pulseCtrl.value),
                     ),
                   ),
@@ -973,7 +977,7 @@ class _ZombieSurvivalGameState extends State<ZombieSurvivalGame>
                   word[i],
                   style: TextStyle(
                     fontFamily: 'monospace',
-                    fontSize: 14,
+                    fontSize: (14 * _fontScale).clamp(10, 18),
                     fontWeight: FontWeight.bold,
                     color: c,
                     decoration: done ? TextDecoration.lineThrough : null,
@@ -1248,7 +1252,10 @@ class _ZombieSurvivalGameState extends State<ZombieSurvivalGame>
         child: AnimatedBuilder(
           animation: _pulseCtrl,
           builder: (_, _) => Container(
-            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 9),
+            padding: EdgeInsets.symmetric(
+              horizontal: (20 * _uiScale).clamp(14, 34),
+              vertical: (8 * _uiScale).clamp(6, 14),
+            ),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(30),
@@ -1267,13 +1274,15 @@ class _ZombieSurvivalGameState extends State<ZombieSurvivalGame>
             ),
             child: Text(
               _typed.isEmpty ? '...' : _typed,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'monospace',
-                fontSize: 18,
-                color: Color(0xFFAAFF66),
+                fontSize: (16 * _fontScale).clamp(12, 24),
+                color: const Color(0xFFAAFF66),
                 fontWeight: FontWeight.bold,
-                letterSpacing: 3,
-                shadows: [Shadow(color: Color(0xFFAAFF66), blurRadius: 8)],
+                letterSpacing: 2.5 * _fontScale,
+                shadows: const [
+                  Shadow(color: Color(0xFFAAFF66), blurRadius: 8),
+                ],
               ),
             ),
           ),
@@ -1319,20 +1328,20 @@ class _ZombieSurvivalGameState extends State<ZombieSurvivalGame>
                   children: [
                     Text(
                       'WAVE $_wave',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'monospace',
-                        fontSize: 52,
+                        fontSize: (52 * _fontScale).clamp(26, 54),
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFFFF4444),
-                        letterSpacing: 6,
-                        shadows: [
+                        color: const Color(0xFFFF4444),
+                        letterSpacing: 6 * _fontScale,
+                        shadows: const [
                           Shadow(color: Color(0xFFFF0000), blurRadius: 20),
                           Shadow(color: Color(0xFFFF0000), blurRadius: 40),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    const Text(
+                    SizedBox(height: 6 * _uiScale),
+                    Text(
                       'INCOMING',
                       style: TextStyle(
                         color: Colors.white54,
@@ -1445,8 +1454,10 @@ class _ZombieSurvivalGameState extends State<ZombieSurvivalGame>
                 const SizedBox(height: 28),
                 // How to play
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 40),
-                  padding: const EdgeInsets.all(16),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: (20 * _uiScale).clamp(10, 36),
+                  ),
+                  padding: EdgeInsets.all((14 * _uiScale).clamp(10, 20)),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white12),
                     borderRadius: BorderRadius.circular(12),
