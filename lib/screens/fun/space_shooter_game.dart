@@ -8,131 +8,27 @@ import '../../services/profile_service.dart';
 
 // ── Word banks ─────────────────────────────────────────────────────────────
 const _kCadetWords = [
-  'cat',
-  'dog',
-  'run',
-  'sun',
-  'hat',
-  'top',
-  'car',
-  'big',
-  'fly',
-  'hot',
-  'cup',
-  'pen',
-  'box',
-  'red',
-  'sky',
-  'ant',
-  'egg',
-  'ice',
-  'owl',
-  'rat',
-  'sea',
-  'arm',
-  'bay',
-  'cow',
-  'dew',
-  'elm',
-  'fan',
-  'fog',
-  'gem',
-  'hen',
-  'ivy',
-  'jaw',
-  'keg',
-  'lip',
-  'mob',
-  'nap',
-  'ore',
-  'pay',
-  'quo',
+  'cat', 'dog', 'run', 'sun', 'hat', 'top', 'car', 'big', 'fly', 'hot',
+  'cup', 'pen', 'box', 'red', 'sky', 'ant', 'egg', 'ice', 'owl', 'rat',
+  'sea', 'arm', 'bay', 'cow', 'dew', 'elm', 'fan', 'fog', 'gem', 'hen',
+  'ivy', 'jaw', 'keg', 'lip', 'mob', 'nap', 'ore', 'pay', 'quo',
 ];
 const _kPilotWords = [
-  'apple',
-  'table',
-  'chair',
-  'house',
-  'water',
-  'light',
-  'plant',
-  'river',
-  'stone',
-  'cloud',
-  'music',
-  'dance',
-  'sleep',
-  'dream',
-  'smile',
-  'happy',
-  'smart',
-  'great',
-  'world',
-  'earth',
-  'class',
-  'school',
-  'study',
-  'learn',
-  'write',
-  'climb',
-  'think',
-  'focus',
-  'start',
-  'brave',
-  'Nepal',
-  'tiger',
-  'eagle',
-  'lotus',
-  'peace',
-  'faith',
-  'grace',
-  'pilot',
-  'speed',
-  'laser',
-  'comet',
-  'orbit',
-  'lunar',
-  'solar',
-  'probe',
-  'radar',
-  'craft',
-  'boost',
-  'cargo',
-  'flare',
+  'apple', 'table', 'chair', 'house', 'water', 'light', 'plant', 'river',
+  'stone', 'cloud', 'music', 'dance', 'sleep', 'dream', 'smile', 'happy',
+  'smart', 'great', 'world', 'earth', 'class', 'school', 'study', 'learn',
+  'write', 'climb', 'think', 'focus', 'start', 'brave', 'Nepal', 'tiger',
+  'eagle', 'lotus', 'peace', 'faith', 'grace', 'pilot', 'speed', 'laser',
+  'comet', 'orbit', 'lunar', 'solar', 'probe', 'radar', 'craft', 'boost',
+  'cargo', 'flare',
 ];
 const _kCommanderWords = [
-  'elephant',
-  'keyboard',
-  'mountain',
-  'beautiful',
-  'computer',
-  'adventure',
-  'champion',
-  'umbrella',
-  'discover',
-  'knowledge',
-  'together',
-  'celebrate',
-  'butterfly',
-  'wonderful',
-  'practice',
-  'question',
-  'remember',
-  'solution',
-  'challenge',
-  'fantastic',
-  'astronaut',
-  'telescope',
-  'spaceship',
-  'navigator',
-  'commander',
-  'atmosphere',
-  'constellation',
-  'acceleration',
-  'determination',
-  'extraordinary',
-  'accomplishment',
-  'masterpiece',
+  'elephant', 'keyboard', 'mountain', 'beautiful', 'computer', 'adventure',
+  'champion', 'umbrella', 'discover', 'knowledge', 'together', 'celebrate',
+  'butterfly', 'wonderful', 'practice', 'question', 'remember', 'solution',
+  'challenge', 'fantastic', 'astronaut', 'telescope', 'spaceship', 'navigator',
+  'commander', 'atmosphere', 'constellation', 'acceleration', 'determination',
+  'extraordinary', 'accomplishment', 'masterpiece',
 ];
 
 // Boss sentences
@@ -150,17 +46,12 @@ enum ShooterDifficulty { cadet, pilot, commander }
 class SpaceEnemy {
   final String id;
   final String word;
-  double x; // 0–1 normalized
-  double y; // pixels from top
-  double speed;
-  final Color color;
-  final Color glowColor;
-  bool targeted; // currently being typed
-  bool dying;
-  double opacity;
-  double scale;
+  double x, y, speed;
+  final Color color, glowColor;
+  bool targeted, dying;
+  double opacity, scale;
   final bool isBoss;
-  int hp; // boss has more hp (characters to type)
+  int hp;
 
   SpaceEnemy({
     required this.id,
@@ -181,13 +72,12 @@ class SpaceEnemy {
 
 // ── Traveling bullet ────────────────────────────────────────────────────────
 class Bullet {
-  double x, y; // current position (pixels)
-  final double vx, vy; // velocity (pixels/sec)
-  final double destX, destY; // destination at fire time
+  double x, y;
+  final double vx, vy, destX, destY;
   final Color color;
   double opacity;
-  final bool isFinal; // last letter → big explosion on hit
-  final String enemyId; // which enemy this targets
+  final bool isFinal;
+  final String enemyId;
 
   Bullet({
     required this.x,
@@ -211,8 +101,7 @@ class Bullet {
 
 // ── Explosion particle ──────────────────────────────────────────────────────
 class Particle {
-  double x, y, vx, vy;
-  double life; // 0→1 countdown
+  double x, y, vx, vy, life;
   final Color color;
   final double size;
 
@@ -230,12 +119,7 @@ class Particle {
 // ── Star (background) ───────────────────────────────────────────────────────
 class Star {
   final double x, y, size, brightness;
-  Star({
-    required this.x,
-    required this.y,
-    required this.size,
-    required this.brightness,
-  });
+  Star({required this.x, required this.y, required this.size, required this.brightness});
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -250,18 +134,10 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
     with TickerProviderStateMixin {
   // ── Game state ─────────────────────────────────────────────────────────
   ShooterDifficulty _difficulty = ShooterDifficulty.cadet;
-  bool _started = false;
-  bool _gameOver = false;
-  bool _paused = false;
-  bool _isBossWave = false;
+  bool _started = false, _gameOver = false, _paused = false, _isBossWave = false;
 
-  int _score = 0;
-  int _highScore = 0;
-  int _lives = 3;
-  int _kills = 0;
-  int _combo = 0;
-  int _maxCombo = 0;
-  int _wave = 1;
+  int _score = 0, _highScore = 0, _lives = 3, _kills = 0;
+  int _combo = 0, _maxCombo = 0, _wave = 1;
 
   // ── Enemies & effects ──────────────────────────────────────────────────
   final List<SpaceEnemy> _enemies = [];
@@ -275,26 +151,26 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
   SpaceEnemy? _lockedTarget;
 
   // ── Ship ───────────────────────────────────────────────────────────────
-  double _shipX = 0.5; // normalized 0–1
-  double _shipAngle = 0.0; // tilt in radians (0 = straight up)
+  double _shipX = 0.5;
+  double _shipAngle = 0.0;
   double _shipTargetAngle = 0.0;
   bool _shipShaking = false;
   late AnimationController _shakeCtrl;
   late AnimationController _pulseCtrl;
   late AnimationController _engineCtrl;
 
-  // ── Timers ─────────────────────────────────────────────────────────────
-  Timer? _gameLoop;
-  Timer? _spawnTimer;
-  Timer? _laserTimer;
-  Timer? _particleTimer;
-
+  // ── Game loop ─────────────────────────────────────────────────────────
+  Timer? _gameLoop, _spawnTimer;
   DateTime? _lastFrame;
 
-  // ── Screen size ─────────────────────────────────────────────────────────
+  // ── Screen size ────────────────────────────────────────────────────────
   double _screenW = 800, _screenH = 600;
   double get _uiScale => min(_screenW, _screenH) / 600.0;
   double get _fontScale => _uiScale.clamp(0.7, 1.35);
+
+  // ── Cached config (rebuilt only on difficulty change) ─────────────────
+  late Map<String, dynamic> _cfgCache;
+  late List<String> _wordBankCache;
 
   final FocusNode _focus = FocusNode();
 
@@ -313,6 +189,7 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     )..repeat(reverse: true);
+    _rebuildConfig();
     _generateStars();
     _loadHighScore();
   }
@@ -324,67 +201,73 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
     _engineCtrl.dispose();
     _gameLoop?.cancel();
     _spawnTimer?.cancel();
-    _laserTimer?.cancel();
-    _particleTimer?.cancel();
     _focus.dispose();
     super.dispose();
   }
 
-  // ── Config ──────────────────────────────────────────────────────────────
-  Map<String, dynamic> get _cfg => {
-    ShooterDifficulty.cadet: {
-      'spawnMs': 3200,
-      'speedMin': 30.0,
-      'speedMax': 55.0,
-      'max': 4,
-    },
-    ShooterDifficulty.pilot: {
-      'spawnMs': 2200,
-      'speedMin': 55.0,
-      'speedMax': 90.0,
-      'max': 6,
-    },
-    ShooterDifficulty.commander: {
-      'spawnMs': 1400,
-      'speedMin': 85.0,
-      'speedMax': 140.0,
-      'max': 9,
-    },
-  }[_difficulty]!;
+  bool get _canPersistScore {
+    final profile = ProfileService();
+    return profile.hasProfile && !profile.isGuest;
+  }
 
-  List<String> get _wordBank => {
-    ShooterDifficulty.cadet: _kCadetWords,
-    ShooterDifficulty.pilot: _kPilotWords,
-    ShooterDifficulty.commander: _kCommanderWords,
-  }[_difficulty]!;
+  // ── Config — cached, rebuilt only when difficulty changes ───────────────
+  void _rebuildConfig() {
+    _cfgCache = {
+      ShooterDifficulty.cadet: {
+        'spawnMs': 3200,
+        'speedMin': 30.0,
+        'speedMax': 55.0,
+        'max': 4,
+      },
+      ShooterDifficulty.pilot: {
+        'spawnMs': 2200,
+        'speedMin': 55.0,
+        'speedMax': 90.0,
+        'max': 6,
+      },
+      ShooterDifficulty.commander: {
+        'spawnMs': 1400,
+        'speedMin': 85.0,
+        'speedMax': 140.0,
+        'max': 9,
+      },
+    }[_difficulty]!;
+
+    _wordBankCache = {
+      ShooterDifficulty.cadet: _kCadetWords,
+      ShooterDifficulty.pilot: _kPilotWords,
+      ShooterDifficulty.commander: _kCommanderWords,
+    }[_difficulty]!;
+  }
 
   // ── Init ────────────────────────────────────────────────────────────────
   void _generateStars() {
     _stars.clear();
     for (int i = 0; i < 120; i++) {
-      _stars.add(
-        Star(
-          x: _rng.nextDouble(),
-          y: _rng.nextDouble(),
-          size: _rng.nextDouble() * 2 + 0.5,
-          brightness: _rng.nextDouble() * 0.6 + 0.3,
-        ),
-      );
+      _stars.add(Star(
+        x: _rng.nextDouble(),
+        y: _rng.nextDouble(),
+        size: _rng.nextDouble() * 2 + 0.5,
+        brightness: _rng.nextDouble() * 0.6 + 0.3,
+      ));
     }
   }
 
   Future<void> _loadHighScore() async {
+    if (!_canPersistScore) {
+      if (mounted) setState(() => _highScore = 0);
+      return;
+    }
     final prefs = await SharedPreferences.getInstance();
-    final key =
-        '${ProfileService().keyPrefix}space_shooter_hs_${_difficulty.name}';
+    final key = '${ProfileService().keyPrefix}space_shooter_hs_${_difficulty.name}';
     setState(() => _highScore = prefs.getInt(key) ?? 0);
   }
 
   Future<void> _saveHighScore() async {
+    if (!_canPersistScore) return;
     if (_score <= _highScore) return;
     final prefs = await SharedPreferences.getInstance();
-    final key =
-        '${ProfileService().keyPrefix}space_shooter_hs_${_difficulty.name}';
+    final key = '${ProfileService().keyPrefix}space_shooter_hs_${_difficulty.name}';
     await prefs.setInt(key, _score);
     setState(() => _highScore = _score);
   }
@@ -440,52 +323,48 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
     _lastFrame = now;
     final safeDt = dt.clamp(0.0, 0.05);
 
-    setState(() {
-      // Move enemies
-      for (final e in _enemies) {
-        if (!e.dying) e.y += e.speed * safeDt;
-      }
-
-      // Fade out dying enemies
-      for (final e in _enemies.where((e) => e.dying)) {
+    // Mutate state objects directly — no copies needed when only calling
+    // removeWhere after the loop (not during), which is safe
+    for (final e in _enemies) {
+      if (!e.dying) {
+        e.y += e.speed * safeDt;
+      } else {
         e.opacity = (e.opacity - safeDt * 3).clamp(0, 1);
         e.scale = (e.scale + safeDt * 2).clamp(1, 3);
       }
+    }
 
-      // Move bullets
-      for (final b in List.from(_bullets)) {
-        b.x += b.vx * safeDt;
-        b.y += b.vy * safeDt;
-        if (b.arrived) {
-          _onBulletHit(b);
-          _bullets.remove(b);
-        }
+    final bulletsToRemove = <Bullet>[];
+    for (final b in _bullets) {
+      b.x += b.vx * safeDt;
+      b.y += b.vy * safeDt;
+      if (b.arrived) {
+        _onBulletHit(b);
+        bulletsToRemove.add(b);
       }
+    }
+    _bullets.removeWhere(bulletsToRemove.contains);
 
-      // Update particles
-      for (final p in _particles) {
-        p.life -= safeDt * 1.8;
-        p.x += p.vx * safeDt;
-        p.y += p.vy * safeDt;
-        p.vy += 80 * safeDt; // gravity
-      }
+    for (final p in _particles) {
+      p.life -= safeDt * 1.8;
+      p.x += p.vx * safeDt;
+      p.y += p.vy * safeDt;
+      p.vy += 80 * safeDt;
+    }
 
-      // Smooth ship tilt toward target
-      final angleDiff = _shipTargetAngle - _shipAngle;
-      _shipAngle += angleDiff * (safeDt * 8).clamp(0, 1);
+    final angleDiff = _shipTargetAngle - _shipAngle;
+    _shipAngle += angleDiff * (safeDt * 8).clamp(0, 1);
 
-      // Remove dead
-      _enemies.removeWhere((e) => e.dying && e.opacity <= 0);
-      _particles.removeWhere((p) => p.life <= 0);
+    _enemies.removeWhere((e) => e.dying && e.opacity <= 0);
+    _particles.removeWhere((p) => p.life <= 0);
 
-      // Check if any enemy hit ground
-      final groundY = _screenH - (90 * _uiScale).clamp(60, 140);
-      for (final e in List.from(_enemies)) {
-        if (!e.dying && e.y > groundY) {
-          _onEnemyReachedGround(e);
-        }
-      }
-    });
+    final groundY = _screenH - (90 * _uiScale).clamp(60, 140);
+    final reachedGround = _enemies.where((e) => !e.dying && e.y > groundY).toList();
+    for (final e in reachedGround) {
+      _onEnemyReachedGround(e);
+    }
+
+    setState(() {}); // single setState per tick — minimal rebuild cost
   }
 
   void _onEnemyReachedGround(SpaceEnemy e) {
@@ -502,13 +381,8 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
         .then((_) => setState(() => _shipShaking = false));
     SoundService().playError();
 
-    // Screen shake particles
-    _spawnExplosionAt(
-      _shipX * _screenW,
-      _screenH - 80,
-      const Color(0xFFFF4444),
-      count: 8,
-    );
+    _spawnExplosionAt(_shipX * _screenW, _screenH - 80,
+        const Color(0xFFFF4444), count: 8);
 
     if (_lives <= 0) _endGame();
   }
@@ -516,7 +390,7 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
   // ── Spawn enemies ────────────────────────────────────────────────────────
   void _scheduleSpawn() {
     _spawnTimer?.cancel();
-    _spawnTimer = Timer(Duration(milliseconds: _cfg['spawnMs'] as int), () {
+    _spawnTimer = Timer(Duration(milliseconds: _cfgCache['spawnMs'] as int), () {
       if (!_gameOver && !_paused && _started) {
         _spawnEnemy();
         _scheduleSpawn();
@@ -526,17 +400,15 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
 
   void _spawnEnemy() {
     if (_isBossWave) return;
-    final maxOnScreen = _cfg['max'] as int;
+    final maxOnScreen = _cfgCache['max'] as int;
     if (_enemies.where((e) => !e.dying).length >= maxOnScreen) return;
 
-    // Check for boss wave
     if (_kills > 0 && _kills % 10 == 0 && !_isBossWave) {
       _spawnBoss();
       return;
     }
 
-    final word = _wordBank[_rng.nextInt(_wordBank.length)];
-    // Avoid same first letter as existing unlocked targets
+    final word = _wordBankCache[_rng.nextInt(_wordBankCache.length)];
     final usedFirstLetters = _enemies
         .where((e) => !e.dying && !e.targeted)
         .map((e) => e.word[0].toLowerCase())
@@ -544,59 +416,51 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
 
     String finalWord = word;
     if (usedFirstLetters.contains(word[0].toLowerCase())) {
-      final alts = _wordBank
+      final alts = _wordBankCache
           .where((w) => !usedFirstLetters.contains(w[0].toLowerCase()))
           .toList();
       if (alts.isNotEmpty) finalWord = alts[_rng.nextInt(alts.length)];
     }
 
     final len = finalWord.length;
-    Color col;
-    Color glow;
+    Color col, glow;
     if (len <= 4) {
-      col = const Color(0xFF50FA7B);
-      glow = const Color(0xFF50FA7B);
+      col = glow = const Color(0xFF50FA7B);
     } else if (len <= 7) {
-      col = const Color(0xFFFFD93D);
-      glow = const Color(0xFFFFD93D);
+      col = glow = const Color(0xFFFFD93D);
     } else {
-      col = const Color(0xFFFF6E6E);
-      glow = const Color(0xFFFF6E6E);
+      col = glow = const Color(0xFFFF6E6E);
     }
 
-    final minSpeed = _cfg['speedMin'] as double;
-    final maxSpeed = _cfg['speedMax'] as double;
+    final minSpeed = _cfgCache['speedMin'] as double;
+    final maxSpeed = _cfgCache['speedMax'] as double;
 
-    _enemies.add(
-      SpaceEnemy(
-        id: '${DateTime.now().millisecondsSinceEpoch}_${_rng.nextInt(9999)}',
-        word: finalWord,
-        x: 0.08 + _rng.nextDouble() * 0.84,
-        y: -60,
-        speed: minSpeed + _rng.nextDouble() * (maxSpeed - minSpeed),
-        color: col,
-        glowColor: glow,
-      ),
-    );
+    _enemies.add(SpaceEnemy(
+      id: '${DateTime.now().millisecondsSinceEpoch}_${_rng.nextInt(9999)}',
+      word: finalWord,
+      x: 0.08 + _rng.nextDouble() * 0.84,
+      y: -60,
+      speed: minSpeed + _rng.nextDouble() * (maxSpeed - minSpeed),
+      color: col,
+      glowColor: glow,
+    ));
   }
 
   void _spawnBoss() {
     _isBossWave = true;
     _wave++;
     final sentence = _kBossSentences[_rng.nextInt(_kBossSentences.length)];
-    _enemies.add(
-      SpaceEnemy(
-        id: 'boss_${DateTime.now().millisecondsSinceEpoch}',
-        word: sentence,
-        x: 0.5,
-        y: -90,
-        speed: 20,
-        color: const Color(0xFFFF5555),
-        glowColor: const Color(0xFFFF0000),
-        isBoss: true,
-        hp: sentence.length,
-      ),
-    );
+    _enemies.add(SpaceEnemy(
+      id: 'boss_${DateTime.now().millisecondsSinceEpoch}',
+      word: sentence,
+      x: 0.5,
+      y: -90,
+      speed: 20,
+      color: const Color(0xFFFF5555),
+      glowColor: const Color(0xFFFF0000),
+      isBoss: true,
+      hp: sentence.length,
+    ));
   }
 
   // ── Explosions ────────────────────────────────────────────────────────────
@@ -604,18 +468,13 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
     for (int i = 0; i < count; i++) {
       final angle = _rng.nextDouble() * 2 * pi;
       final speed = 60 + _rng.nextDouble() * 200;
-      _particles.add(
-        Particle(
-          x: x,
-          y: y,
-          vx: cos(angle) * speed,
-          vy: sin(angle) * speed - 80,
-          color: i % 3 == 0
-              ? Colors.white
-              : (i % 3 == 1 ? col : col.withValues(alpha: 0.6)),
-          size: 2 + _rng.nextDouble() * 5,
-        ),
-      );
+      _particles.add(Particle(
+        x: x, y: y,
+        vx: cos(angle) * speed,
+        vy: sin(angle) * speed - 80,
+        color: i % 3 == 0 ? Colors.white : (i % 3 == 1 ? col : col.withValues(alpha: 0.6)),
+        size: 2 + _rng.nextDouble() * 5,
+      ));
     }
   }
 
@@ -630,53 +489,36 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
     final dy = ty - sy;
     final dist = sqrt(dx * dx + dy * dy);
     const speed = 900.0;
-    final vx = (dx / dist) * speed;
-    final vy = (dy / dist) * speed;
 
     final col = target.isBoss
         ? const Color(0xFFFF3388)
         : isFinal
-        ? const Color(0xFFFFFFFF)
-        : const Color(0xFF00FFFF);
+            ? const Color(0xFFFFFFFF)
+            : const Color(0xFF00FFFF);
 
-    _bullets.add(
-      Bullet(
-        x: sx,
-        y: sy,
-        vx: vx,
-        vy: vy,
-        destX: tx,
-        destY: ty,
-        color: col,
-        enemyId: target.id,
-        isFinal: isFinal,
-      ),
-    );
+    _bullets.add(Bullet(
+      x: sx, y: sy,
+      vx: (dx / dist) * speed,
+      vy: (dy / dist) * speed,
+      destX: tx, destY: ty,
+      color: col,
+      enemyId: target.id,
+      isFinal: isFinal,
+    ));
 
-    // Aim ship toward target
     _shipTargetAngle = atan2(dx, -dy).clamp(-0.7, 0.7);
   }
 
   void _onBulletHit(Bullet b) {
-    // Find enemy this bullet was aimed at
-    final enemy = _enemies
-        .where((e) => e.id == b.enemyId && !e.dying)
-        .firstOrNull;
+    final enemy = _enemies.where((e) => e.id == b.enemyId && !e.dying).firstOrNull;
     if (enemy == null) return;
 
     if (b.isFinal) {
-      // Big explosion — destroy enemy
       enemy.dying = true;
-      _spawnExplosionAt(
-        b.destX,
-        b.destY,
-        enemy.color,
-        count: enemy.isBoss ? 40 : 20,
-      );
-      // Move ship toward last target
+      _spawnExplosionAt(b.destX, b.destY, enemy.color,
+          count: enemy.isBoss ? 40 : 20);
       _shipX = (_shipX * 0.65 + enemy.x * 0.35).clamp(0.05, 0.95);
     } else {
-      // Small hit spark per letter
       _spawnHitSpark(b.destX, b.destY, b.color);
     }
   }
@@ -685,17 +527,14 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
     for (int i = 0; i < 5; i++) {
       final angle = _rng.nextDouble() * 2 * pi;
       final speed = 30 + _rng.nextDouble() * 80;
-      _particles.add(
-        Particle(
-          x: x,
-          y: y,
-          vx: cos(angle) * speed,
-          vy: sin(angle) * speed - 40,
-          color: i == 0 ? Colors.white : col,
-          size: 1.5 + _rng.nextDouble() * 2.5,
-          life: 0.5,
-        ),
-      );
+      _particles.add(Particle(
+        x: x, y: y,
+        vx: cos(angle) * speed,
+        vy: sin(angle) * speed - 40,
+        color: i == 0 ? Colors.white : col,
+        size: 1.5 + _rng.nextDouble() * 2.5,
+        life: 0.5,
+      ));
     }
   }
 
@@ -727,28 +566,23 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
     if (char == null) return;
 
     setState(() {
-      // Lock onto a target if not already locked
       if (_lockedTarget == null || !_enemies.contains(_lockedTarget)) {
         _lockedTarget = null;
         _typed = '';
-        // Find first enemy whose word starts with typed char
         for (final e in _enemies) {
           if (!e.dying &&
               e.word.toLowerCase().startsWith(char!.toLowerCase())) {
             _lockedTarget = e;
             e.targeted = true;
+            final tx = _lockedTarget!.x * _screenW;
+            final ty = _lockedTarget!.y;
+            final sx = _shipX * _screenW;
+            final sy = _screenH - 80;
+            _shipTargetAngle = atan2(tx - sx, -(ty - sy)).clamp(-0.7, 0.7);
             break;
           }
         }
-        if (_lockedTarget == null) return; // no match
-        // Aim ship toward newly locked target
-        final tx = _lockedTarget!.x * _screenW;
-        final ty = _lockedTarget!.y;
-        final sx = _shipX * _screenW;
-        final sy = _screenH - 80;
-        final dx = tx - sx;
-        final dy = ty - sy;
-        _shipTargetAngle = atan2(dx, -dy).clamp(-0.7, 0.7);
+        if (_lockedTarget == null) return;
       }
 
       final target = _lockedTarget!;
@@ -761,46 +595,32 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
         final isLast = _typed.length >= target.word.length;
         _fireBullet(target, isFinal: isLast);
 
-        // Word complete?
-        if (isLast) {
-          _destroyEnemy(target);
-        }
+        if (isLast) _destroyEnemy(target);
       } else {
         SoundService().playError();
         _combo = 0;
-        // Shake typed text but don't reset
       }
     });
   }
 
   void _destroyEnemy(SpaceEnemy target) {
-    // dying + explosion handled by the final bullet's _onBulletHit
-    // But set dying immediately so enemy stops moving
     target.dying = true;
-
     _kills++;
     _combo++;
     if (_combo > _maxCombo) _maxCombo = _combo;
 
-    final comboMult = _combo >= 10
-        ? 3
-        : _combo >= 5
-        ? 2
-        : 1;
+    final comboMult = _combo >= 10 ? 3 : _combo >= 5 ? 2 : 1;
     final diffMult = _difficulty == ShooterDifficulty.commander
         ? 3
         : _difficulty == ShooterDifficulty.pilot
-        ? 2
-        : 1;
-    final points =
+            ? 2
+            : 1;
+    _score +=
         target.word.replaceAll(' ', '').length * 10 * comboMult * diffMult +
-        (target.isBoss ? 500 : 0);
-    _score += points;
+            (target.isBoss ? 500 : 0);
 
     _typed = '';
     _lockedTarget = null;
-
-    // Unmark all targets
     for (final e in _enemies) {
       e.targeted = false;
     }
@@ -812,7 +632,6 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
       SoundService().playStreak();
     }
 
-    // Check for boss wave trigger
     if (_kills % 10 == 0 && !_isBossWave) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted && !_gameOver) _spawnBoss();
@@ -835,9 +654,7 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
             _screenH = constraints.maxHeight;
             return Stack(
               children: [
-                // ── Space background ────────────────────────────────────────
                 _buildBackground(),
-                // ── Game objects ────────────────────────────────────────────
                 if (_started && !_gameOver) ...[
                   _buildEnemies(),
                   _buildBullets(),
@@ -846,7 +663,6 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
                   _buildHUD(),
                   _buildTypingInput(),
                 ],
-                // ── Screens ─────────────────────────────────────────────────
                 if (!_started || _gameOver) _buildMenuOrGameOver(),
                 if (_paused && _started && !_gameOver) _buildPauseScreen(),
               ],
@@ -894,13 +710,11 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Alien ship SVG-style drawn with CustomPaint
         CustomPaint(
           size: Size(50 * _uiScale, 32 * _uiScale),
           painter: _AlienPainter(e.color, e.targeted, e.dying),
         ),
         SizedBox(height: 4 * _uiScale),
-        // Word label
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
@@ -911,12 +725,7 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
               width: e.targeted ? 1.5 : 1,
             ),
             boxShadow: e.targeted
-                ? [
-                    BoxShadow(
-                      color: e.color.withValues(alpha: 0.4),
-                      blurRadius: 8,
-                    ),
-                  ]
+                ? [BoxShadow(color: e.color.withValues(alpha: 0.4), blurRadius: 8)]
                 : null,
           ),
           child: _buildWordDisplay(e.word, typed, e.color),
@@ -929,6 +738,7 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Boss uses AnimatedBuilder only for pulse — not every enemy
         AnimatedBuilder(
           animation: _pulseCtrl,
           builder: (_, _) => CustomPaint(
@@ -938,22 +748,17 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
         ),
         SizedBox(height: 6 * _uiScale),
         Container(
-          constraints: BoxConstraints(
-            maxWidth: (340 * _uiScale).clamp(220, 420),
-          ),
+          constraints: BoxConstraints(maxWidth: (340 * _uiScale).clamp(220, 420)),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.85),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFFF5555), width: 2),
-            boxShadow: const [
-              BoxShadow(color: Color(0x66FF0000), blurRadius: 16),
-            ],
+            boxShadow: const [BoxShadow(color: Color(0x66FF0000), blurRadius: 16)],
           ),
           child: _buildWordDisplay(e.word, typed, const Color(0xFFFF8888)),
         ),
         const SizedBox(height: 4),
-        // HP bar
         Container(
           width: (200 * _uiScale).clamp(120, 260),
           height: (6 * _uiScale).clamp(4, 12),
@@ -964,17 +769,12 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
           ),
           child: FractionallySizedBox(
             alignment: Alignment.centerLeft,
-            widthFactor: ((e.word.length - typed.length) / e.word.length).clamp(
-              0,
-              1,
-            ),
+            widthFactor: ((e.word.length - typed.length) / e.word.length).clamp(0, 1),
             child: Container(
               decoration: BoxDecoration(
                 color: const Color(0xFFFF5555),
                 borderRadius: BorderRadius.circular(3),
-                boxShadow: const [
-                  BoxShadow(color: Color(0xAAFF0000), blurRadius: 4),
-                ],
+                boxShadow: const [BoxShadow(color: Color(0xAAFF0000), blurRadius: 4)],
               ),
             ),
           ),
@@ -990,18 +790,15 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
           final Color c = i < typed.length
               ? activeColor.withValues(alpha: 0.4)
               : i == typed.length
-              ? activeColor
-              : Colors.white.withValues(alpha: 0.85);
+                  ? activeColor
+                  : Colors.white.withValues(alpha: 0.85);
           final bg = i == typed.length && typed.isNotEmpty
               ? activeColor.withValues(alpha: 0.15)
               : null;
           return WidgetSpan(
             child: Container(
               decoration: bg != null
-                  ? BoxDecoration(
-                      color: bg,
-                      borderRadius: BorderRadius.circular(2),
-                    )
+                  ? BoxDecoration(color: bg, borderRadius: BorderRadius.circular(2))
                   : null,
               child: Text(
                 word[i],
@@ -1010,9 +807,7 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
                   fontSize: (word.length > 20 ? 13 : 16) * _fontScale,
                   fontWeight: FontWeight.bold,
                   color: c,
-                  decoration: i < typed.length
-                      ? TextDecoration.lineThrough
-                      : null,
+                  decoration: i < typed.length ? TextDecoration.lineThrough : null,
                   decorationColor: activeColor,
                 ),
               ),
@@ -1047,7 +842,6 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
         final shake = _shipShaking
             ? sin(_shakeCtrl.value * pi * 8) * 6 * (1 - _shakeCtrl.value)
             : 0.0;
-        final engineFlicker = _engineCtrl.value;
         final shipW = (60 * _uiScale).clamp(36, 84).toDouble();
         final shipH = (70 * _uiScale).clamp(42, 96).toDouble();
         return Positioned(
@@ -1056,7 +850,7 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
           child: CustomPaint(
             size: Size(shipW, shipH),
             painter: _ShipPainter(
-              engineFlicker,
+              _engineCtrl.value,
               _shipShaking && _shakeCtrl.value > 0.1,
               _shipAngle,
             ),
@@ -1068,11 +862,7 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
 
   // ── HUD ───────────────────────────────────────────────────────────────────
   Widget _buildHUD() {
-    final comboMult = _combo >= 10
-        ? 3
-        : _combo >= 5
-        ? 2
-        : 1;
+    final comboMult = _combo >= 10 ? 3 : _combo >= 5 ? 2 : 1;
     return Positioned(
       top: 0,
       left: 0,
@@ -1088,7 +878,6 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
         ),
         child: Row(
           children: [
-            // Back button
             GestureDetector(
               onTap: () => Navigator.pop(context),
               child: Container(
@@ -1097,64 +886,35 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
                   border: Border.all(color: Colors.white24),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.white70,
-                  size: 16,
-                ),
+                child: const Icon(Icons.arrow_back_ios,
+                    color: Colors.white70, size: 16),
               ),
             ),
             const SizedBox(width: 16),
-
-            // Score
-            _HudChip(
-              label: 'SCORE',
-              value: '$_score',
-              color: const Color(0xFF00FFFF),
-            ),
+            _HudChip(label: 'SCORE', value: '$_score', color: const Color(0xFF00FFFF)),
             const SizedBox(width: 12),
-
-            // Best
-            _HudChip(
-              label: 'BEST',
-              value: '$_highScore',
-              color: const Color(0xFFFFD700),
-            ),
+            _HudChip(label: 'BEST', value: '$_highScore', color: const Color(0xFFFFD700)),
             const SizedBox(width: 12),
-
-            // Wave
-            _HudChip(
-              label: 'WAVE',
-              value: '$_wave',
-              color: const Color(0xFFFF79C6),
-            ),
-
+            _HudChip(label: 'WAVE', value: '$_wave', color: const Color(0xFFFF79C6)),
             const Spacer(),
-
-            // Combo
             if (_combo >= 3)
               AnimatedBuilder(
                 animation: _pulseCtrl,
                 builder: (_, _) => Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withValues(
-                      alpha: 0.1 + _pulseCtrl.value * 0.1,
-                    ),
+                    color: Colors.orange
+                        .withValues(alpha: 0.1 + _pulseCtrl.value * 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Colors.orange.withValues(
-                        alpha: 0.6 + _pulseCtrl.value * 0.4,
-                      ),
+                      color: Colors.orange
+                          .withValues(alpha: 0.6 + _pulseCtrl.value * 0.4),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.orange.withValues(alpha: 0.3),
-                        blurRadius: 12,
-                      ),
+                          color: Colors.orange.withValues(alpha: 0.3),
+                          blurRadius: 12),
                     ],
                   ),
                   child: Text(
@@ -1166,18 +926,14 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
                       letterSpacing: 1.5,
                       shadows: [
                         Shadow(
-                          color: Colors.orange.withValues(alpha: 0.8),
-                          blurRadius: 8,
-                        ),
+                            color: Colors.orange.withValues(alpha: 0.8),
+                            blurRadius: 8),
                       ],
                     ),
                   ),
                 ),
               ),
-
             const SizedBox(width: 16),
-
-            // Lives
             Row(
               children: List.generate(
                 3,
@@ -1190,18 +946,13 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
                         : Colors.white12,
                     size: 22,
                     shadows: i < _lives
-                        ? const [
-                            Shadow(color: Color(0xAAFF0000), blurRadius: 8),
-                          ]
+                        ? const [Shadow(color: Color(0xAAFF0000), blurRadius: 8)]
                         : null,
                   ),
                 ),
               ),
             ),
-
             const SizedBox(width: 16),
-
-            // Pause
             GestureDetector(
               onTap: _togglePause,
               child: Container(
@@ -1235,16 +986,14 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
               color: Colors.black.withValues(alpha: 0.75),
               borderRadius: BorderRadius.circular(30),
               border: Border.all(
-                color: const Color(
-                  0xFF00FFFF,
-                ).withValues(alpha: 0.4 + _pulseCtrl.value * 0.3),
+                color: const Color(0xFF00FFFF)
+                    .withValues(alpha: 0.4 + _pulseCtrl.value * 0.3),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF00FFFF).withValues(alpha: 0.2),
-                  blurRadius: 12,
-                ),
+                    color: const Color(0xFF00FFFF).withValues(alpha: 0.2),
+                    blurRadius: 12),
               ],
             ),
             child: Text(
@@ -1255,9 +1004,7 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
                 color: const Color(0xFF00FFFF),
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2.5 * _fontScale,
-                shadows: const [
-                  Shadow(color: Color(0xFF00FFFF), blurRadius: 8),
-                ],
+                shadows: const [Shadow(color: Color(0xFF00FFFF), blurRadius: 8)],
               ),
             ),
           ),
@@ -1265,8 +1012,6 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
       ),
     );
   }
-
-  // ── Boss wave announcement ───────────────────────────────────────────────
 
   // ── Menu / Game Over ──────────────────────────────────────────────────────
   Widget _buildMenuOrGameOver() {
@@ -1278,7 +1023,6 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Title
               if (!isOver) ...[
                 const Text('🚀', style: TextStyle(fontSize: 56)),
                 const SizedBox(height: 12),
@@ -1297,10 +1041,7 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
                 const Text(
                   'TYPE THE WORDS TO DESTROY ALIEN INVADERS',
                   style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 13,
-                    letterSpacing: 2,
-                  ),
+                      color: Colors.white54, fontSize: 13, letterSpacing: 2),
                 ),
               ] else ...[
                 const Text('💥', style: TextStyle(fontSize: 56)),
@@ -1325,15 +1066,11 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
               ],
               const SizedBox(height: 32),
 
-              // Difficulty selector
               if (!isOver) ...[
                 const Text(
                   'SELECT DIFFICULTY',
                   style: TextStyle(
-                    color: Colors.white38,
-                    fontSize: 11,
-                    letterSpacing: 3,
-                  ),
+                      color: Colors.white38, fontSize: 11, letterSpacing: 3),
                 ),
                 const SizedBox(height: 14),
                 Row(
@@ -1344,12 +1081,11 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
                       sub: 'Short words\nSlow speed',
                       selected: _difficulty == ShooterDifficulty.cadet,
                       color: const Color(0xFF50FA7B),
-                      onTap: () {
-                        setState(() {
-                          _difficulty = ShooterDifficulty.cadet;
-                          _loadHighScore();
-                        });
-                      },
+                      onTap: () => setState(() {
+                        _difficulty = ShooterDifficulty.cadet;
+                        _rebuildConfig();
+                        _loadHighScore();
+                      }),
                     ),
                     const SizedBox(width: 12),
                     _DiffBtn(
@@ -1357,12 +1093,11 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
                       sub: 'Medium words\nMed speed',
                       selected: _difficulty == ShooterDifficulty.pilot,
                       color: const Color(0xFFFFD93D),
-                      onTap: () {
-                        setState(() {
-                          _difficulty = ShooterDifficulty.pilot;
-                          _loadHighScore();
-                        });
-                      },
+                      onTap: () => setState(() {
+                        _difficulty = ShooterDifficulty.pilot;
+                        _rebuildConfig();
+                        _loadHighScore();
+                      }),
                     ),
                     const SizedBox(width: 12),
                     _DiffBtn(
@@ -1370,20 +1105,15 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
                       sub: 'Long words\nFast speed',
                       selected: _difficulty == ShooterDifficulty.commander,
                       color: const Color(0xFFFF6E6E),
-                      onTap: () {
-                        setState(() {
-                          _difficulty = ShooterDifficulty.commander;
-                          _loadHighScore();
-                        });
-                      },
+                      onTap: () => setState(() {
+                        _difficulty = ShooterDifficulty.commander;
+                        _rebuildConfig();
+                        _loadHighScore();
+                      }),
                     ),
                   ],
                 ),
                 const SizedBox(height: 32),
-              ],
-
-              // How to play
-              if (!isOver) ...[
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 40),
                   padding: const EdgeInsets.all(16),
@@ -1391,59 +1121,46 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
                     border: Border.all(color: Colors.white12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Column(
-                    children: const [
-                      Text(
-                        'HOW TO PLAY',
-                        style: TextStyle(
-                          color: Colors.white38,
-                          fontSize: 10,
-                          letterSpacing: 3,
-                        ),
-                      ),
+                  child: const Column(
+                    children: [
+                      Text('HOW TO PLAY',
+                          style: TextStyle(
+                              color: Colors.white38,
+                              fontSize: 10,
+                              letterSpacing: 3)),
                       SizedBox(height: 10),
                       _HowToRow(
-                        icon: '⌨',
-                        text:
-                            'Type the word on an alien to target and shoot it',
-                      ),
+                          icon: '⌨',
+                          text: 'Type the word on an alien to target and shoot it'),
                       _HowToRow(
-                        icon: '💥',
-                        text:
-                            'Complete the word to fire a laser and destroy it',
-                      ),
+                          icon: '💥',
+                          text: 'Complete the word to fire a laser and destroy it'),
                       _HowToRow(
-                        icon: '⭐',
-                        text:
-                            'Chain kills for combo multiplier (5x = 2x, 10x = 3x)',
-                      ),
+                          icon: '⭐',
+                          text: 'Chain kills for combo multiplier (5x = 2x, 10x = 3x)'),
                       _HowToRow(
-                        icon: '👾',
-                        text:
-                            'Boss appears every 10 kills — type a sentence to defeat it',
-                      ),
+                          icon: '👾',
+                          text: 'Boss appears every 10 kills — type a sentence to defeat it'),
                       _HowToRow(
-                        icon: '❤',
-                        text:
-                            'You have 3 lives — don\'t let aliens reach Earth!',
-                      ),
+                          icon: '❤',
+                          text: 'You have 3 lives — don\'t let aliens reach Earth!'),
                     ],
                   ),
                 ),
                 const SizedBox(height: 32),
               ],
 
-              // Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (isOver)
+                  if (isOver) ...[
                     _SpaceBtn(
                       label: '← MENU',
                       color: Colors.white38,
                       onTap: () => Navigator.pop(context),
                     ),
-                  if (isOver) const SizedBox(width: 16),
+                    const SizedBox(width: 16),
+                  ],
                   _SpaceBtn(
                     label: isOver ? '▶ PLAY AGAIN' : '▶ LAUNCH MISSION',
                     color: const Color(0xFF00FFFF),
@@ -1468,27 +1185,22 @@ class _SpaceShooterGameState extends State<SpaceShooterGame>
           children: [
             const Text('⏸', style: TextStyle(fontSize: 48)),
             const SizedBox(height: 16),
-            const Text(
-              'PAUSED',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 6,
-              ),
-            ),
+            const Text('PAUSED',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 6)),
             const SizedBox(height: 32),
             _SpaceBtn(
-              label: '▶ RESUME',
-              color: const Color(0xFF00FFFF),
-              onTap: _togglePause,
-            ),
+                label: '▶ RESUME',
+                color: const Color(0xFF00FFFF),
+                onTap: _togglePause),
             const SizedBox(height: 12),
             _SpaceBtn(
-              label: '← QUIT',
-              color: Colors.white38,
-              onTap: () => Navigator.pop(context),
-            ),
+                label: '← QUIT',
+                color: Colors.white38,
+                onTap: () => Navigator.pop(context)),
           ],
         ),
       ),
@@ -1505,22 +1217,28 @@ class _StarfieldPainter extends CustomPainter {
   final double pulse;
   _StarfieldPainter(this.stars, this.pulse);
 
+  // Cache background shader rect so it isn't reallocated every frame
+  static Rect? _cachedRect;
+  static Shader? _cachedShader;
+
   @override
   void paint(Canvas canvas, Size size) {
-    // Deep space gradient
-    final bg = Paint()
-      ..shader = LinearGradient(
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+
+    // Only recreate gradient shader if size changed
+    if (_cachedRect != rect) {
+      _cachedRect = rect;
+      _cachedShader = const LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [
-          const Color(0xFF000814),
-          const Color(0xFF001233),
-          const Color(0xFF000814),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bg);
+        colors: [Color(0xFF000814), Color(0xFF001233), Color(0xFF000814)],
+      ).createShader(rect);
+    }
 
-    // Nebula glow
+    final bg = Paint()..shader = _cachedShader;
+    canvas.drawRect(rect, bg);
+
+    // Nebula glow — infrequent blur, drawn once
     final nebula = Paint()
       ..color = const Color(0xFF1A0033).withValues(alpha: 0.4)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 80);
@@ -1528,34 +1246,26 @@ class _StarfieldPainter extends CustomPainter {
     nebula.color = const Color(0xFF002244).withValues(alpha: 0.3);
     canvas.drawCircle(Offset(size.width * 0.8, size.height * 0.6), 160, nebula);
 
-    // Stars
+    final starPaint = Paint();
     for (final s in stars) {
       final twinkle = s.brightness * (0.7 + pulse * 0.3);
-      final p = Paint()..color = Colors.white.withValues(alpha: twinkle);
-      canvas.drawCircle(Offset(s.x * size.width, s.y * size.height), s.size, p);
+      starPaint.color = Colors.white.withValues(alpha: twinkle);
+      canvas.drawCircle(
+          Offset(s.x * size.width, s.y * size.height), s.size, starPaint);
     }
 
-    // Ground / earth shield
-    final groundPaint = Paint()
-      ..color = const Color(0xFF0A3060).withValues(alpha: 0.6)
-      ..style = PaintingStyle.fill;
-    final groundPath = Path()
-      ..moveTo(0, size.height - 40)
-      ..lineTo(size.width, size.height - 40)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-    canvas.drawPath(groundPath, groundPaint);
-
-    // Shield line
-    final shieldPaint = Paint()
-      ..color = const Color(0xFF00AAFF).withValues(alpha: 0.3)
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
+    // Ground
+    canvas.drawRect(
+      Rect.fromLTRB(0, size.height - 40, size.width, size.height),
+      Paint()..color = const Color(0xFF0A3060).withValues(alpha: 0.6),
+    );
     canvas.drawLine(
       Offset(0, size.height - 40),
       Offset(size.width, size.height - 40),
-      shieldPaint,
+      Paint()
+        ..color = const Color(0xFF00AAFF).withValues(alpha: 0.3)
+        ..strokeWidth = 2
+        ..style = PaintingStyle.stroke,
     );
   }
 
@@ -1565,8 +1275,7 @@ class _StarfieldPainter extends CustomPainter {
 
 class _AlienPainter extends CustomPainter {
   final Color color;
-  final bool targeted;
-  final bool dying;
+  final bool targeted, dying;
   _AlienPainter(this.color, this.targeted, this.dying);
 
   @override
@@ -1579,61 +1288,48 @@ class _AlienPainter extends CustomPainter {
     final cx = size.width / 2;
     final cy = size.height / 2;
 
-    // Glow
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(cx, cy),
-        width: size.width * 0.9,
-        height: size.height * 0.7,
-      ),
+          center: Offset(cx, cy), width: size.width * 0.9, height: size.height * 0.7),
       glow,
     );
 
-    // Body — saucer shape
     final body = Paint()
       ..color = color.withValues(alpha: dying ? 0.2 : 0.85)
       ..style = PaintingStyle.fill;
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(cx, cy + 4),
-        width: size.width * 0.85,
-        height: size.height * 0.55,
-      ),
+          center: Offset(cx, cy + 4),
+          width: size.width * 0.85,
+          height: size.height * 0.55),
       body,
     );
 
-    // Dome
     final dome = Paint()
       ..color = color.withValues(alpha: dying ? 0.1 : 0.5)
       ..style = PaintingStyle.fill;
-    final domePath = Path();
-    domePath.addOval(
+    canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(cx, cy - 2),
-        width: size.width * 0.42,
-        height: size.height * 0.55,
-      ),
+          center: Offset(cx, cy - 2),
+          width: size.width * 0.42,
+          height: size.height * 0.55),
+      dome,
     );
-    canvas.drawPath(domePath, dome);
 
-    // Lights
     if (!dying) {
       final light = Paint()..color = Colors.white.withValues(alpha: 0.9);
       for (int i = 0; i < 5; i++) {
-        final lx = cx - 16 + i * 8.0;
-        canvas.drawCircle(Offset(lx, cy + 6), 2, light);
+        canvas.drawCircle(Offset(cx - 16 + i * 8.0, cy + 6), 2, light);
       }
     }
 
-    // Outline
     p.style = PaintingStyle.stroke;
     p.strokeWidth = 1.5;
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(cx, cy + 4),
-        width: size.width * 0.85,
-        height: size.height * 0.55,
-      ),
+          center: Offset(cx, cy + 4),
+          width: size.width * 0.85,
+          height: size.height * 0.55),
       p,
     );
   }
@@ -1654,82 +1350,66 @@ class _BossPainter extends CustomPainter {
     final cx = size.width / 2;
     final cy = size.height / 2;
 
-    // Big glow
     final glow = Paint()
       ..color = color.withValues(alpha: 0.15 + pulse * 0.1)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20);
     canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(cx, cy),
-        width: size.width,
-        height: size.height,
-      ),
+      Rect.fromCenter(center: Offset(cx, cy), width: size.width, height: size.height),
       glow,
     );
 
-    // Main body
     final body = Paint()..color = color.withValues(alpha: dying ? 0.2 : 0.8);
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(cx, cy + 6),
-        width: size.width * 0.9,
-        height: size.height * 0.65,
-      ),
+          center: Offset(cx, cy + 6),
+          width: size.width * 0.9,
+          height: size.height * 0.65),
       body,
     );
 
-    // Wings
     final wing = Paint()..color = color.withValues(alpha: dying ? 0.15 : 0.5);
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(cx - size.width * 0.35, cy + 4),
-        width: size.width * 0.3,
-        height: size.height * 0.35,
-      ),
+          center: Offset(cx - size.width * 0.35, cy + 4),
+          width: size.width * 0.3,
+          height: size.height * 0.35),
       wing,
     );
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(cx + size.width * 0.35, cy + 4),
-        width: size.width * 0.3,
-        height: size.height * 0.35,
-      ),
+          center: Offset(cx + size.width * 0.35, cy + 4),
+          width: size.width * 0.3,
+          height: size.height * 0.35),
       wing,
     );
 
-    // Dome
     final dome = Paint()..color = color.withValues(alpha: dying ? 0.1 : 0.4);
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(cx, cy - 4),
-        width: size.width * 0.38,
-        height: size.height * 0.6,
-      ),
+          center: Offset(cx, cy - 4),
+          width: size.width * 0.38,
+          height: size.height * 0.6),
       dome,
     );
 
-    // Pulsing lights
     if (!dying) {
       final light = Paint()
         ..color = Colors.white.withValues(alpha: 0.7 + pulse * 0.3)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
       for (int i = 0; i < 7; i++) {
-        final lx = cx - 24 + i * 8.0;
-        canvas.drawCircle(Offset(lx, cy + 8), 3, light);
+        canvas.drawCircle(Offset(cx - 24 + i * 8.0, cy + 8), 3, light);
       }
     }
 
-    // Outline
     final outline = Paint()
       ..color = color.withValues(alpha: 0.8 + pulse * 0.2)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(cx, cy + 6),
-        width: size.width * 0.9,
-        height: size.height * 0.65,
-      ),
+          center: Offset(cx, cy + 6),
+          width: size.width * 0.9,
+          height: size.height * 0.65),
       outline,
     );
   }
@@ -1742,7 +1422,7 @@ class _BossPainter extends CustomPainter {
 class _ShipPainter extends CustomPainter {
   final double engineFlicker;
   final bool hit;
-  final double tiltAngle; // radians, 0=straight up
+  final double tiltAngle;
   _ShipPainter(this.engineFlicker, this.hit, this.tiltAngle);
 
   @override
@@ -1750,34 +1430,28 @@ class _ShipPainter extends CustomPainter {
     final cx = size.width / 2;
     final cy = size.height / 2;
 
-    // Apply tilt rotation around ship center
     canvas.save();
     canvas.translate(cx, cy);
     canvas.rotate(tiltAngle);
     canvas.translate(-cx, -cy);
 
-    // Engine flame
     final flame = Paint()
-      ..color = Color.lerp(
-        const Color(0xFFFF8800),
-        const Color(0xFFFFFF00),
-        engineFlicker,
-      )!.withValues(alpha: 0.8 + engineFlicker * 0.2)
+      ..color = Color.lerp(const Color(0xFFFF8800), const Color(0xFFFFFF00),
+              engineFlicker)!
+          .withValues(alpha: 0.8 + engineFlicker * 0.2)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(cx, size.height - 8),
-        width: 16,
-        height: 20 + engineFlicker * 10,
-      ),
+          center: Offset(cx, size.height - 8),
+          width: 16,
+          height: 20 + engineFlicker * 10),
       flame,
     );
 
-    // Body
     final bodyColor = hit ? const Color(0xFFFF4444) : const Color(0xFF4FC3F7);
     final body = Paint()..color = bodyColor;
     final bodyPath = Path()
-      ..moveTo(cx, 0) // nose
+      ..moveTo(cx, 0)
       ..lineTo(cx + 18, size.height - 20)
       ..lineTo(cx + 10, size.height - 10)
       ..lineTo(cx - 10, size.height - 10)
@@ -1785,7 +1459,6 @@ class _ShipPainter extends CustomPainter {
       ..close();
     canvas.drawPath(bodyPath, body);
 
-    // Wings
     final wing = Paint()..color = const Color(0xFF0288D1);
     final lWing = Path()
       ..moveTo(cx - 14, size.height - 28)
@@ -1800,25 +1473,20 @@ class _ShipPainter extends CustomPainter {
     canvas.drawPath(lWing, wing);
     canvas.drawPath(rWing, wing);
 
-    // Cockpit
     final cockpit = Paint()
       ..color = const Color(0xFFB3E5FC).withValues(alpha: 0.9);
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(cx, size.height * 0.38),
-        width: 14,
-        height: 18,
-      ),
+          center: Offset(cx, size.height * 0.38), width: 14, height: 18),
       cockpit,
     );
 
-    // Glow
     final glow = Paint()
       ..color = bodyColor.withValues(alpha: 0.3)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
     canvas.drawPath(bodyPath, glow);
 
-    canvas.restore(); // end tilt rotation
+    canvas.restore();
   }
 
   @override
@@ -1835,22 +1503,18 @@ class _BulletPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     for (final b in bullets) {
-      // Outer glow
       final glow = Paint()
         ..color = b.color.withValues(alpha: b.opacity * 0.45)
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, b.isFinal ? 10 : 6);
       canvas.drawCircle(Offset(b.x, b.y), b.isFinal ? 9 : 5, glow);
 
-      // Core bullet
       final core = Paint()..color = b.color.withValues(alpha: b.opacity);
       canvas.drawCircle(Offset(b.x, b.y), b.isFinal ? 4 : 2.5, core);
 
-      // White hot center
       final center = Paint()
         ..color = Colors.white.withValues(alpha: b.opacity * 0.9);
       canvas.drawCircle(Offset(b.x, b.y), b.isFinal ? 2 : 1.2, center);
 
-      // Trail (draw a short line behind direction of travel)
       if (b.vx != 0 || b.vy != 0) {
         final speed = sqrt(b.vx * b.vx + b.vy * b.vy);
         final trailLen = b.isFinal ? 20.0 : 12.0;
@@ -1878,9 +1542,8 @@ class _ParticlePainter extends CustomPainter {
     for (final p in particles) {
       final paint = Paint()
         ..color = p.color.withValues(alpha: p.life.clamp(0, 1))
-        ..maskFilter = p.size > 4
-            ? const MaskFilter.blur(BlurStyle.normal, 3)
-            : null;
+        ..maskFilter =
+            p.size > 4 ? const MaskFilter.blur(BlurStyle.normal, 3) : null;
       canvas.drawCircle(Offset(p.x, p.y), p.size * p.life, paint);
     }
   }
@@ -1893,44 +1556,33 @@ class _ParticlePainter extends CustomPainter {
 class _HudChip extends StatelessWidget {
   final String label, value;
   final Color color;
-  const _HudChip({
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+  const _HudChip({required this.label, required this.value, required this.color});
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-    decoration: BoxDecoration(
-      color: color.withValues(alpha: 0.08),
-      borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: color.withValues(alpha: 0.3)),
-    ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: color.withValues(alpha: 0.7),
-            fontSize: 9,
-            letterSpacing: 1.5,
-          ),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            color: color,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            shadows: [
-              Shadow(color: color.withValues(alpha: 0.6), blurRadius: 6),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(label,
+                style: TextStyle(
+                    color: color.withValues(alpha: 0.7),
+                    fontSize: 9,
+                    letterSpacing: 1.5)),
+            Text(value,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  shadows: [Shadow(color: color.withValues(alpha: 0.6), blurRadius: 6)],
+                )),
+          ],
         ),
-      ],
-    ),
-  );
+      );
 }
 
 class _DiffBtn extends StatelessWidget {
@@ -1947,62 +1599,52 @@ class _DiffBtn extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: AnimatedContainer(
-      duration: const Duration(milliseconds: 150),
-      width: 120,
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
-      decoration: BoxDecoration(
-        color: selected ? color.withValues(alpha: 0.15) : Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: selected ? color : Colors.white24,
-          width: selected ? 2 : 1,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: 120,
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+          decoration: BoxDecoration(
+            color: selected ? color.withValues(alpha: 0.15) : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: selected ? color : Colors.white24,
+                width: selected ? 2 : 1),
+            boxShadow: selected
+                ? [BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 12)]
+                : null,
+          ),
+          child: Column(
+            children: [
+              Text(label,
+                  style: TextStyle(
+                      color: selected ? color : Colors.white54,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1)),
+              const SizedBox(height: 6),
+              Text(sub,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: selected
+                          ? color.withValues(alpha: 0.8)
+                          : Colors.white30,
+                      fontSize: 10,
+                      height: 1.4)),
+              if (selected) ...[
+                const SizedBox(height: 6),
+                Icon(Icons.check_circle, color: color, size: 14),
+              ],
+            ],
+          ),
         ),
-        boxShadow: selected
-            ? [BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 12)]
-            : null,
-      ),
-      child: Column(
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: selected ? color : Colors.white54,
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            sub,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: selected ? color.withValues(alpha: 0.8) : Colors.white30,
-              fontSize: 10,
-              height: 1.4,
-            ),
-          ),
-          if (selected) ...[
-            const SizedBox(height: 6),
-            Icon(Icons.check_circle, color: color, size: 14),
-          ],
-        ],
-      ),
-    ),
-  );
+      );
 }
 
 class _SpaceBtn extends StatefulWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
-  const _SpaceBtn({
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
+  const _SpaceBtn({required this.label, required this.color, required this.onTap});
   @override
   State<_SpaceBtn> createState() => _SpaceBtnState();
 }
@@ -2011,43 +1653,38 @@ class _SpaceBtnState extends State<_SpaceBtn> {
   bool _hovered = false;
   @override
   Widget build(BuildContext context) => MouseRegion(
-    onEnter: (_) => setState(() => _hovered = true),
-    onExit: (_) => setState(() => _hovered = false),
-    child: GestureDetector(
-      onTap: widget.onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 120),
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-        decoration: BoxDecoration(
-          color: _hovered
-              ? widget.color.withValues(alpha: 0.15)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: widget.color, width: 1.5),
-          boxShadow: _hovered
-              ? [
-                  BoxShadow(
-                    color: widget.color.withValues(alpha: 0.4),
-                    blurRadius: 16,
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          widget.label,
-          style: TextStyle(
-            color: widget.color,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 2,
-            shadows: _hovered
-                ? [Shadow(color: widget.color, blurRadius: 8)]
-                : null,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 120),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+            decoration: BoxDecoration(
+              color: _hovered
+                  ? widget.color.withValues(alpha: 0.15)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: widget.color, width: 1.5),
+              boxShadow: _hovered
+                  ? [BoxShadow(color: widget.color.withValues(alpha: 0.4), blurRadius: 16)]
+                  : null,
+            ),
+            child: Text(
+              widget.label,
+              style: TextStyle(
+                color: widget.color,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+                shadows: _hovered
+                    ? [Shadow(color: widget.color, blurRadius: 8)]
+                    : null,
+              ),
+            ),
           ),
         ),
-      ),
-    ),
-  );
+      );
 }
 
 class _StatRow extends StatelessWidget {
@@ -2055,38 +1692,30 @@ class _StatRow extends StatelessWidget {
   const _StatRow({required this.label, required this.value});
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 3),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 120,
-          child: Text(
-            label,
-            textAlign: TextAlign.right,
-            style: const TextStyle(
-              color: Colors.white38,
-              fontSize: 12,
-              letterSpacing: 2,
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 120,
+              child: Text(label,
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                      color: Colors.white38, fontSize: 12, letterSpacing: 2)),
             ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        SizedBox(
-          width: 80,
-          child: Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'monospace',
+            const SizedBox(width: 16),
+            SizedBox(
+              width: 80,
+              child: Text(value,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'monospace')),
             ),
-          ),
+          ],
         ),
-      ],
-    ),
-  );
+      );
 }
 
 class _HowToRow extends StatelessWidget {
@@ -2094,18 +1723,16 @@ class _HowToRow extends StatelessWidget {
   const _HowToRow({required this.icon, required this.text});
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 3),
-    child: Row(
-      children: [
-        Text(icon, style: const TextStyle(fontSize: 16)),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(color: Colors.white54, fontSize: 12),
-          ),
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(text,
+                  style: const TextStyle(color: Colors.white54, fontSize: 12)),
+            ),
+          ],
         ),
-      ],
-    ),
-  );
+      );
 }

@@ -5,6 +5,7 @@ import 'services/progress_service.dart';
 import 'services/stats_service.dart';
 import 'services/achievements_service.dart';
 import 'services/sound_service.dart';
+import 'services/lesson_progress_service.dart';
 import 'screens/home/home_screen.dart';
 
 void main() async {
@@ -14,6 +15,7 @@ void main() async {
   await StatsService().init();
   await AchievementsService().init();
   await SoundService().init();
+  await LessonProgressService().init(); // was never called — lesson progress was silently lost
 
   // If no saved profile exists, silently create a Guest profile in memory.
   // Users go straight to the home screen — no forced sign-up on first visit.
@@ -31,7 +33,7 @@ class TypingQuestApp extends StatelessWidget {
       title: 'TypingQuest',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
-      home: const HomeScreen(), // always HomeScreen — guest or real profile
+      home: const HomeScreen(),
     );
   }
 }

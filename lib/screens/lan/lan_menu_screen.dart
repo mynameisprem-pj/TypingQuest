@@ -25,6 +25,7 @@ class LanMenuScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
+          // Static background — shouldRepaint returns false, painted once
           SizedBox.expand(child: CustomPaint(painter: _LanBgPainter())),
           SafeArea(
             child: LayoutBuilder(
@@ -42,7 +43,7 @@ class LanMenuScreen extends StatelessWidget {
                     ),
                   ),
                 );
-              }
+              },
             ),
           ),
         ],
@@ -54,7 +55,6 @@ class LanMenuScreen extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Icon + title
         Container(
           width: 80,
           height: 80,
@@ -75,7 +75,6 @@ class LanMenuScreen extends StatelessWidget {
         ),
         const SizedBox(height: 48),
 
-        // How it works
         Container(
           constraints: const BoxConstraints(maxWidth: 600),
           padding: const EdgeInsets.all(20),
@@ -87,18 +86,21 @@ class LanMenuScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('HOW IT WORKS', style: AppTheme.body(12, color: AppTheme.textSecondary).copyWith(letterSpacing: 2)),
+              Text(
+                'HOW IT WORKS',
+                style: AppTheme.body(12, color: AppTheme.textSecondary)
+                    .copyWith(letterSpacing: 2),
+              ),
               const SizedBox(height: 14),
-              _HowToStep(number: '1', text: 'One student clicks HOST and shares their IP address with classmates'),
-              _HowToStep(number: '2', text: 'Other students click JOIN and enter the host\'s IP address'),
-              _HowToStep(number: '3', text: 'When everyone is ready, the host clicks START RACE'),
-              _HowToStep(number: '4', text: 'Everyone types the same text — watch live progress bars!'),
+              const _HowToStep(number: '1', text: 'One student clicks HOST and shares their IP address with classmates'),
+              const _HowToStep(number: '2', text: 'Other students click JOIN and enter the host\'s IP address'),
+              const _HowToStep(number: '3', text: 'When everyone is ready, the host clicks START RACE'),
+              const _HowToStep(number: '4', text: 'Everyone types the same text — watch live progress bars!'),
             ],
           ),
         ),
         const SizedBox(height: 32),
 
-        // Buttons
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -107,7 +109,10 @@ class LanMenuScreen extends StatelessWidget {
               label: 'HOST GAME',
               subtitle: 'Create a room for your class',
               color: AppTheme.gold,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HostScreen())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const HostScreen()),
+              ),
             ),
             const SizedBox(width: 20),
             _LanActionButton(
@@ -115,7 +120,10 @@ class LanMenuScreen extends StatelessWidget {
               label: 'JOIN GAME',
               subtitle: 'Enter the host\'s IP address',
               color: AppTheme.primary,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const JoinScreen())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const JoinScreen()),
+              ),
             ),
           ],
         ),
@@ -129,7 +137,8 @@ class LanMenuScreen extends StatelessWidget {
       children: [
         const Icon(Icons.info_outline, color: AppTheme.gold, size: 60),
         const SizedBox(height: 20),
-        Text('LAN Race Requires Windows App', style: AppTheme.heading(22, color: AppTheme.gold)),
+        Text('LAN Race Requires Windows App',
+            style: AppTheme.heading(22, color: AppTheme.gold)),
         const SizedBox(height: 12),
         Container(
           constraints: const BoxConstraints(maxWidth: 500),
@@ -163,16 +172,21 @@ class _HowToStep extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 24, height: 24,
+            width: 24,
+            height: 24,
             decoration: BoxDecoration(
               color: AppTheme.gold.withValues(alpha: 0.15),
               shape: BoxShape.circle,
               border: Border.all(color: AppTheme.gold.withValues(alpha: 0.4)),
             ),
-            child: Center(child: Text(number, style: AppTheme.body(12, color: AppTheme.gold))),
+            child: Center(
+              child: Text(number, style: AppTheme.body(12, color: AppTheme.gold)),
+            ),
           ),
           const SizedBox(width: 12),
-          Expanded(child: Text(text, style: AppTheme.body(14, color: AppTheme.textPrimary))),
+          Expanded(
+            child: Text(text, style: AppTheme.body(14, color: AppTheme.textPrimary)),
+          ),
         ],
       ),
     );
@@ -215,8 +229,13 @@ class _LanActionButtonState extends State<_LanActionButton> {
           decoration: BoxDecoration(
             color: _hovered ? widget.color.withValues(alpha: 0.1) : AppTheme.card,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: _hovered ? widget.color : AppTheme.cardBorder, width: _hovered ? 1.5 : 1),
-            boxShadow: _hovered ? [BoxShadow(color: widget.color.withValues(alpha: 0.25), blurRadius: 20)] : null,
+            border: Border.all(
+              color: _hovered ? widget.color : AppTheme.cardBorder,
+              width: _hovered ? 1.5 : 1,
+            ),
+            boxShadow: _hovered
+                ? [BoxShadow(color: widget.color.withValues(alpha: 0.25), blurRadius: 20)]
+                : null,
           ),
           child: Column(
             children: [
@@ -224,7 +243,11 @@ class _LanActionButtonState extends State<_LanActionButton> {
               const SizedBox(height: 12),
               Text(widget.label, style: AppTheme.heading(15, color: widget.color)),
               const SizedBox(height: 6),
-              Text(widget.subtitle, style: AppTheme.body(12, color: AppTheme.textSecondary), textAlign: TextAlign.center),
+              Text(
+                widget.subtitle,
+                style: AppTheme.body(12, color: AppTheme.textSecondary),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),
@@ -236,7 +259,9 @@ class _LanActionButtonState extends State<_LanActionButton> {
 class _LanBgPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = AppTheme.gold.withValues(alpha: 0.03)..strokeWidth = 1;
+    final paint = Paint()
+      ..color = AppTheme.gold.withValues(alpha: 0.03)
+      ..strokeWidth = 1;
     for (double x = 0; x < size.width; x += 40) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
     }

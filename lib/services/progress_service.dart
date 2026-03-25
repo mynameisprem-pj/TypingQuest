@@ -13,16 +13,27 @@ class ProgressService {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  // Profile-scoped key: "p_{id}_beginner_5_stars"
-  String get _p => ProfileService().keyPrefix;
+  /// Lazily obtains SharedPreferences so calls before [init] still work.
+  Future<SharedPreferences> _getPrefs() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs!;
+  }
+
+  // Profile-scoped key: "p_{id}_beginner_5"
+  String get _p   => ProfileService().keyPrefix;
   String _key(Difficulty d, int level) => '$_p${d.name}_$level';
 
+  // ── Write ──────────────────────────────────────────────────────────────
+
   Future<void> saveResult(Difficulty d, int level, LevelResult result) async {
-    await _prefs?.setInt('${_key(d, level)}_wpm', result.wpm);
-    await _prefs?.setDouble('${_key(d, level)}_acc', result.accuracy);
-    await _prefs?.setInt('${_key(d, level)}_stars', result.stars);
-    await _prefs?.setBool('${_key(d, level + 1)}_unlocked', true);
+    final prefs = await _getPrefs();
+    await prefs.setInt(   '${_key(d, level)}_wpm',              result.wpm);
+    await prefs.setDouble('${_key(d, level)}_acc',              result.accuracy);
+    await prefs.setInt(   '${_key(d, level)}_stars',            result.stars);
+    await prefs.setBool(  '${_key(d, level + 1)}_unlocked',     true);
   }
+
+  // ── Read ───────────────────────────────────────────────────────────────
 
   bool isUnlocked(Difficulty d, int level) {
     if (level == 1) return true;
@@ -53,5 +64,28 @@ class ProgressService {
     return 1;
   }
 
-  Future<void> resetAll() async => await _prefs?.clear();
+  // ── Reset ──────────────────────────────────────────────────────────────
+
+  /// Removes only the keys that belong to the currently active profile.
+  ///
+  /// Previously this called [SharedPreferences.clear()] which wiped ALL
+  /// profiles — a critical data-loss bug. Now only keys starting with the
+  /// active profile's prefix are deleted.
+  Future<void> resetAll() async {
+    final prefs  = await _getPrefs();
+    final prefix = _p;
+
+    if (prefix.isEmpty) {
+      // Guest profile — nothing was ever written to storage; nothing to clear.
+      return;
+    }
+
+    final keysToRemove = prefs.getKeys()
+        .where((k) => k.startsWith(prefix))
+        .toList();
+
+    for (final key in keysToRemove) {
+      await prefs.remove(key);
+    }
+  }
 }

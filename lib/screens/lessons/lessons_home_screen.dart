@@ -50,7 +50,9 @@ class _LessonsHomeScreenState extends State<LessonsHomeScreen> {
   Widget _buildBody() {
     return Stack(
       children: [
-        SizedBox.expand(child: CustomPaint(painter: _BgPainter())),
+        RepaintBoundary(
+          child: SizedBox.expand(child: CustomPaint(painter: _BgPainter())),
+        ),
         SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(

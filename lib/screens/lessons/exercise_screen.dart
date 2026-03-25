@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../theme/app_theme.dart';
 import '../../data/lesson_data.dart';
 import '../../services/lesson_progress_service.dart';
+import '../../services/sound_service.dart';
 import '../../widgets/virtual_keyboard.dart';
 
 class ExerciseScreen extends StatefulWidget {
@@ -29,6 +30,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
   // Typing state
   int _currentIndex = 0;
   bool _lastWasWrong = false;
+  bool _errorRecordedForCurrentChar = false;
   int _errorCount = 0;
   bool _started = false;
   bool _exerciseDone = false;
@@ -78,6 +80,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
       _currentExercise = widget.lesson.exercises[index];
       _currentIndex = 0;
       _lastWasWrong = false;
+      _errorRecordedForCurrentChar = false;
       _errorCount = 0;
       _started = false;
       _exerciseDone = false;
@@ -91,7 +94,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
 
   void _handleKey(KeyEvent event) {
     if (_exerciseDone) return;
-    if (event is! KeyDownEvent && event is! KeyRepeatEvent) return;
+    if (event is! KeyDownEvent) return;
 
     String? char;
     if (event.character != null && event.character!.isNotEmpty) {
@@ -103,7 +106,9 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
         setState(() {
           _currentIndex--;
           _lastWasWrong = false;
+          _errorRecordedForCurrentChar = false;
         });
+        SoundService().playKeyClick();
       }
       return;
     }
@@ -112,10 +117,13 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
     if (!_started) {
       _started = true;
       _stopwatch.start();
-      _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      _timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
         setState(() {
           _seconds = _stopwatch.elapsed.inSeconds;
-          if (_seconds > 0) _wpm = ((_currentIndex / 5) / (_seconds / 60)).round();
+          final elapsedMs = _stopwatch.elapsedMilliseconds;
+          if (elapsedMs > 0) {
+            _wpm = ((_currentIndex / 5) / (elapsedMs / 60000)).round();
+          }
         });
       });
     }
@@ -123,13 +131,22 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
     final expected = _currentExercise.text[_currentIndex];
 
     if (char == expected) {
+      SoundService().playKeyClick();
       setState(() {
         _currentIndex++;
         _lastWasWrong = false;
+        _errorRecordedForCurrentChar = false;
         if (_currentIndex == _currentExercise.text.length) _onExerciseComplete();
       });
     } else {
-      setState(() { _lastWasWrong = true; _errorCount++; });
+      SoundService().playError();
+      setState(() {
+        _lastWasWrong = true;
+        if (!_errorRecordedForCurrentChar) {
+          _errorCount++;
+          _errorRecordedForCurrentChar = true;
+        }
+      });
       _shakeController.forward(from: 0);
     }
   }
@@ -138,6 +155,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
     _stopwatch.stop();
     _timer?.cancel();
     _exerciseDone = true;
+    SoundService().playLevelComplete();
 
     final accuracy = _errorCount == 0
         ? 100.0
@@ -159,7 +177,12 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
       _resetForExercise(_exerciseIndex + 1);
     } else {
       // All exercises done — mark lesson complete
-      LessonProgressService().markLessonComplete(widget.course.id, widget.lesson.id);
+      final lessonIndex = widget.course.lessons.indexWhere((l) => l.id == widget.lesson.id);
+      LessonProgressService().markLessonComplete(
+        widget.course.id,
+        widget.lesson.id,
+        lessonIndex >= 0 ? lessonIndex : 0,
+      );
       _showLessonCompleteDialog();
     }
   }
@@ -182,11 +205,10 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     final text = _currentExercise.text;
-    final progress = _exerciseIndex / widget.lesson.exercises.length;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
-      appBar: _buildAppBar(progress),
+      appBar: _buildAppBar(),
       body: KeyboardListener(
         focusNode: _focusNode,
         autofocus: true,
@@ -216,11 +238,15 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
               ),
             ),
             // Virtual keyboard
-            VirtualKeyboard(
-              highlightChar: _exerciseDone ? null : (_currentIndex < text.length ? text[_currentIndex] : null),
-              wasWrong: _lastWasWrong,
-              showFingerColors: true,
-              showHandGuide: true,
+            RepaintBoundary(
+              child: IgnorePointer(
+                child: VirtualKeyboard(
+                  highlightChar: _exerciseDone ? null : (_currentIndex < text.length ? text[_currentIndex] : null),
+                  wasWrong: _lastWasWrong,
+                  showFingerColors: true,
+                  showHandGuide: true,
+                ),
+              ),
             ),
           ],
         ),
@@ -228,7 +254,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
     );
   }
 
-  PreferredSizeWidget _buildAppBar(double progress) {
+  PreferredSizeWidget _buildAppBar() {
     return AppBar(
       backgroundColor: AppTheme.surface,
       elevation: 0,
@@ -309,6 +335,31 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
   }
 
   Widget _buildTextArea(String text) {
+    final beforeStyle = AppTheme.mono(
+      26,
+      color: AppTheme.textSecondary.withValues(alpha: 0.5),
+    );
+    final afterStyle = AppTheme.mono(26, color: AppTheme.textPrimary);
+    final currentStyle = AppTheme.mono(
+      26,
+      color: _lastWasWrong ? AppTheme.error : AppTheme.textPrimary,
+    ).copyWith(
+      backgroundColor: _lastWasWrong
+          ? AppTheme.error.withValues(alpha: 0.2)
+          : AppTheme.primary.withValues(alpha: 0.2),
+    );
+
+    final spans = <InlineSpan>[];
+    if (_currentIndex > 0) {
+      spans.add(TextSpan(text: text.substring(0, _currentIndex), style: beforeStyle));
+    }
+    if (_currentIndex < text.length) {
+      spans.add(TextSpan(text: text[_currentIndex], style: currentStyle));
+    }
+    if (_currentIndex + 1 < text.length) {
+      spans.add(TextSpan(text: text.substring(_currentIndex + 1), style: afterStyle));
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(28),
@@ -322,29 +373,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> with TickerProviderStat
       child: Center(
         child: RichText(
           textAlign: TextAlign.center,
-          text: TextSpan(
-            children: List.generate(text.length, (i) {
-              Color color;
-              Color? bg;
-
-              if (i < _currentIndex) {
-                color = AppTheme.textSecondary.withValues(alpha: 0.5);
-              } else if (i == _currentIndex) {
-                color = _lastWasWrong ? AppTheme.error : AppTheme.textPrimary;
-                bg = _lastWasWrong ? AppTheme.error.withValues(alpha: 0.2) : AppTheme.primary.withValues(alpha: 0.2);
-              } else {
-                color = AppTheme.textPrimary;
-              }
-
-              return WidgetSpan(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 2),
-                  decoration: bg != null ? BoxDecoration(color: bg, borderRadius: BorderRadius.circular(3)) : null,
-                  child: Text(text[i], style: AppTheme.mono(26, color: color)),
-                ),
-              );
-            }),
-          ),
+          text: TextSpan(children: spans),
         ),
       ),
     );

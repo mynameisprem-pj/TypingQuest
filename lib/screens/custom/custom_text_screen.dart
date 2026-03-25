@@ -10,19 +10,17 @@ import '../../widgets/achievement_toast.dart';
 
 // ── Token: one word or one paragraph-break marker ───────────────────────────
 class _Token {
-  final String text;       // actual characters to type
-  final bool isParagraph;  // visual paragraph break (typed as a space)
+  final String text;
+  final bool isParagraph;
   const _Token(this.text, {this.isParagraph = false});
 }
 
 // ── Normalize raw pasted text into a token list ──────────────────────────────
 List<_Token> _tokenize(String raw) {
-  // Split on paragraph breaks (2+ newlines)
   final paragraphs = raw.split(RegExp(r'\n{2,}'));
   final tokens = <_Token>[];
 
   for (int pi = 0; pi < paragraphs.length; pi++) {
-    // Within each paragraph collapse all whitespace to single spaces
     final words = paragraphs[pi]
         .trim()
         .replaceAll(RegExp(r'[ \t\r\n]+'), ' ')
@@ -32,14 +30,11 @@ List<_Token> _tokenize(String raw) {
 
     for (int wi = 0; wi < words.length; wi++) {
       tokens.add(_Token(words[wi]));
-      // Add a space after every word except the last word of the last paragraph
       if (wi < words.length - 1 || pi < paragraphs.length - 1) {
         tokens.add(_Token(' '));
       }
     }
 
-    // After each paragraph (except last) add a visible paragraph-break token
-    // typed as a single space
     if (pi < paragraphs.length - 1) {
       tokens.add(_Token(' ', isParagraph: true));
     }
@@ -47,9 +42,23 @@ List<_Token> _tokenize(String raw) {
   return tokens;
 }
 
-// ── Flatten tokens back to a single string for WPM counting ─────────────────
 String _tokensToString(List<_Token> tokens) =>
     tokens.map((t) => t.text).join();
+
+// ── Build position map: token index → start char index in flat string ────────
+// This is extracted as a top-level function so it can be called once in
+// _startPractice and cached — previously it was rebuilt inside _buildTextDisplay
+// on every keystroke (O(n) per keypress).
+List<int> _buildTokenStarts(List<_Token> tokens) {
+  int pos = 0;
+  return [
+    for (final t in tokens) () {
+      final start = pos;
+      pos += t.text.length;
+      return start;
+    }(),
+  ];
+}
 
 // ═════════════════════════════════════════════════════════════════════════════
 class CustomTextScreen extends StatefulWidget {
@@ -63,10 +72,13 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
   final _textCtrl = TextEditingController();
 
   // ── Practice state ─────────────────────────────────────────────────────────
-  List<_Token> _tokens = [];
-  String _targetFlat = '';   // flat string for index math
+  List<_Token> _tokens     = [];
+  String       _targetFlat = '';
+  // Cached token-start positions — rebuilt once per practice session,
+  // NOT on every keypress as was the case before.
+  List<int>    _tokenStart = [];
 
-  int  _currentIndex = 0;    // index into _targetFlat
+  int  _currentIndex = 0;
   bool _lastWasWrong = false;
   int  _errorCount   = 0;
   bool _started      = false;
@@ -79,11 +91,11 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
   int _correctStreak = 0;
 
   // ── Scroll / cursor ────────────────────────────────────────────────────────
-  final FocusNode       _focusNode      = FocusNode();
-  final ScrollController _scrollCtrl    = ScrollController();
-  final GlobalKey        _cursorKey     = GlobalKey();
+  final FocusNode        _focusNode   = FocusNode();
+  final ScrollController _scrollCtrl  = ScrollController();
+  final GlobalKey        _cursorKey   = GlobalKey();
 
-  // ── Colors ─────────────────────────────────────────────────────────────────
+  // ── Colours ────────────────────────────────────────────────────────────────
   static const _accent = Color(0xFFCE93D8);
 
   @override
@@ -120,8 +132,12 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
     _timer?.cancel();
     _stopwatch.reset();
 
+    // Build the token-start map ONCE here so _buildTextDisplay never has to.
+    final starts = _buildTokenStarts(tokens);
+
     setState(() {
       _tokens       = tokens;
+      _tokenStart   = starts;    // cached — not rebuilt per keypress
       _targetFlat   = flat;
       _currentIndex = 0;
       _lastWasWrong = false;
@@ -150,15 +166,12 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
       }
       return;
     } else if (event.logicalKey == LogicalKeyboardKey.enter) {
-      char = ' '; // paragraph transition
+      char = ' ';
     } else if (event.logicalKey == LogicalKeyboardKey.space) {
       char = ' ';
     } else if (event.character != null && event.character!.isNotEmpty) {
-      // Primary source — works for letters, numbers
       char = event.character!;
     } else {
-      // Fallback for symbols that event.character misses (apostrophe, quotes,
-      // brackets, etc.) — keyLabel gives the raw key string e.g. "'" ";" "["
       final label = event.logicalKey.keyLabel;
       if (label.length == 1) char = label;
     }
@@ -182,11 +195,9 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
     if (_currentIndex >= _targetFlat.length) return;
     final expected = _targetFlat[_currentIndex];
 
-    // If expected is a space (or paragraph-space), accept EITHER space OR enter
     final isSpaceToken = expected == ' ';
-    final pressed      = char;
-    final correct      = pressed == expected ||
-        (isSpaceToken && (pressed == ' ' || pressed == '\n'));
+    final correct = char == expected ||
+        (isSpaceToken && (char == ' ' || char == '\n'));
 
     if (correct) {
       SoundService().playKeyClick();
@@ -211,8 +222,8 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
       if (ctx != null) {
         Scrollable.ensureVisible(
           ctx,
-          duration: const Duration(milliseconds: 100),
-          curve: Curves.easeOut,
+          duration:  const Duration(milliseconds: 100),
+          curve:     Curves.easeOut,
           alignment: 0.35,
         );
       }
@@ -230,12 +241,18 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
         : ((_targetFlat.length - _errorCount) / _targetFlat.length * 100)
             .clamp(0.0, 100.0);
     await StatsService().recordSession(TypingSession(
-      date: DateTime.now(), wpm: _wpm, accuracy: accuracy,
-      wordsTyped: _currentIndex ~/ 5, durationSeconds: _seconds, mode: 'custom',
+      date:            DateTime.now(),
+      wpm:             _wpm,
+      accuracy:        accuracy,
+      wordsTyped:      _currentIndex ~/ 5,
+      durationSeconds: _seconds,
+      mode:            'custom',
     ));
     await AchievementsService().checkAll(
-      bestWpm: StatsService().getBestWpm(), lastAccuracy: accuracy,
-      totalSessions: StatsService().getTotalSessions(), customFirst: true,
+      bestWpm:       StatsService().getBestWpm(),
+      lastAccuracy:  accuracy,
+      totalSessions: StatsService().getTotalSessions(),
+      customFirst:   true,
     );
   }
 
@@ -247,7 +264,8 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surface,
         elevation: 0,
-        title: Text('CUSTOM TEXT', style: AppTheme.heading(16, color: _accent)),
+        title: Text('CUSTOM TEXT',
+            style: AppTheme.heading(16, color: _accent)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primary),
           onPressed: _practiceMode
@@ -295,35 +313,41 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
             Wrap(
               spacing: 8, runSpacing: 8,
               children: _presets.map((p) => GestureDetector(
-                onTap: () {
-                  _textCtrl.value = TextEditingValue(
-                    text: p.text,
-                    selection: TextSelection.collapsed(offset: p.text.length),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                  decoration: BoxDecoration(
-                    color: _accent.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: _accent.withValues(alpha: 0.3)),
-                  ),
-                  child: Text(p.label, style: AppTheme.body(12, color: _accent)),
-                ),
-              )).toList(),
+                    onTap: () {
+                      _textCtrl.value = TextEditingValue(
+                        text:      p.text,
+                        selection: TextSelection.collapsed(
+                            offset: p.text.length),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 7),
+                      decoration: BoxDecoration(
+                        color:        _accent.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                            color: _accent.withValues(alpha: 0.3)),
+                      ),
+                      child: Text(p.label,
+                          style: AppTheme.body(12, color: _accent)),
+                    ),
+                  )).toList(),
             ),
             const SizedBox(height: 16),
 
             // Counter row
             Row(children: [
-              Text('TEXT', style: AppTheme.body(11, color: AppTheme.textMuted)
-                  .copyWith(letterSpacing: 2)),
+              Text('TEXT',
+                  style: AppTheme.body(11, color: AppTheme.textMuted)
+                      .copyWith(letterSpacing: 2)),
               const Spacer(),
               if (wordCount > 0) ...[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 9, vertical: 3),
                   decoration: BoxDecoration(
-                    color: _accent.withValues(alpha: 0.1),
+                    color:        _accent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text('$wordCount words',
@@ -331,13 +355,15 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
                 ),
                 const SizedBox(width: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 9, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.08),
+                    color:        AppTheme.primary.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text('$charCount chars',
-                      style: AppTheme.body(11, color: AppTheme.primary)),
+                      style: AppTheme.body(11,
+                          color: AppTheme.primary)),
                 ),
               ],
             ]),
@@ -347,41 +373,47 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
             Expanded(
               child: TextField(
                 controller: _textCtrl,
-                maxLines: null,
-                expands: true,
-                style: AppTheme.mono(14),
+                maxLines:   null,
+                expands:    true,
+                style:      AppTheme.mono(14),
                 decoration: InputDecoration(
-                  hintText: 'Paste or type your text here...\n\nParagraphs are supported — each blank line creates a new paragraph.',
+                  hintText:
+                      'Paste or type your text here...\n\nParagraphs are supported — each blank line creates a new paragraph.',
                   alignLabelWithHint: true,
-                  contentPadding: const EdgeInsets.all(16),
-                  filled: true,
-                  fillColor: AppTheme.card,
+                  contentPadding:     const EdgeInsets.all(16),
+                  filled:             true,
+                  fillColor:          AppTheme.card,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppTheme.cardBorder)),
+                      borderSide: const BorderSide(
+                          color: AppTheme.cardBorder)),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: _accent, width: 1.5)),
+                      borderSide:
+                          const BorderSide(color: _accent, width: 1.5)),
                 ),
               ),
             ),
             const SizedBox(height: 14),
 
-            // Word count hint
             if (wordCount > 0)
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Row(children: [
                   Icon(Icons.check_circle_outline,
-                      size: 14,
-                      color: wordCount >= 10 ? AppTheme.success : AppTheme.gold),
+                      size:  14,
+                      color: wordCount >= 10
+                          ? AppTheme.success
+                          : AppTheme.gold),
                   const SizedBox(width: 6),
                   Text(
                     wordCount < 10
                         ? 'Add a few more words to get started'
                         : 'Ready! $wordCount words across ${_textCtrl.text.split(RegExp(r'\n{2,}')).where((p) => p.trim().isNotEmpty).length} paragraph(s)',
                     style: AppTheme.body(12,
-                        color: wordCount >= 10 ? AppTheme.success : AppTheme.gold),
+                        color: wordCount >= 10
+                            ? AppTheme.success
+                            : AppTheme.gold),
                   ),
                 ]),
               ),
@@ -389,20 +421,22 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                icon: const Icon(Icons.play_arrow_rounded),
-                label: Text('START PRACTICE', style: AppTheme.heading(14)),
+                icon:  const Icon(Icons.play_arrow_rounded),
+                label: Text('START PRACTICE',
+                    style: AppTheme.heading(14)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _accent,
-                  foregroundColor: AppTheme.background,
+                  backgroundColor:        _accent,
+                  foregroundColor:        AppTheme.background,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                   disabledBackgroundColor: AppTheme.cardBorder,
                 ),
-                onPressed:
-                    _textCtrl.text.trim().split(RegExp(r'\s+')).length >= 5
-                        ? _startPractice
-                        : null,
+                onPressed: _textCtrl.text.trim()
+                            .split(RegExp(r'\s+'))
+                            .length >= 5
+                    ? _startPractice
+                    : null,
               ),
             ),
           ],
@@ -429,14 +463,14 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           color: AppTheme.surface,
           child: Row(children: [
-            _Chip('WPM',  '$_wpm',                          AppTheme.primary),
+            _Chip('WPM',  '$_wpm',                           AppTheme.primary),
             const SizedBox(width: 16),
             _Chip('ACC',  '${accuracy.toStringAsFixed(0)}%', AppTheme.gold),
             const SizedBox(width: 16),
-            _Chip('TIME', '${_seconds ~/ 60}:${(_seconds % 60).toString().padLeft(2,'0')}',
+            _Chip('TIME',
+                '${_seconds ~/ 60}:${(_seconds % 60).toString().padLeft(2, '0')}',
                 AppTheme.textSecondary),
             const Spacer(),
-            // word progress
             Text(
               '${(_currentIndex / 5).floor()} / ${(_targetFlat.length / 5).floor()} words',
               style: AppTheme.body(12, color: AppTheme.textSecondary),
@@ -444,15 +478,15 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
           ]),
         ),
         LinearProgressIndicator(
-          value: prog,
+          value:           prog,
           backgroundColor: AppTheme.cardBorder,
-          valueColor: const AlwaysStoppedAnimation(_accent),
-          minHeight: 3,
+          valueColor:      const AlwaysStoppedAnimation(_accent),
+          minHeight:       3,
         ),
-        // WPM graph
         Container(
           color: AppTheme.surface,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
           child: WpmGraph(samples: _wpmSamples, height: 48),
         ),
         Container(height: 1, color: AppTheme.cardBorder),
@@ -461,10 +495,11 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
+              width:   double.infinity,
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 32, vertical: 28),
               decoration: BoxDecoration(
-                color: AppTheme.card,
+                color:        AppTheme.card,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: _finished
@@ -484,40 +519,32 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
     );
   }
 
-  // ── Text display — word-by-word with auto-scroll ───────────────────────────
+  // ── Text display ──────────────────────────────────────────────────────────
   Widget _buildTextDisplay() {
-    // Build position map: token index → start char index in _targetFlat
-    int pos = 0;
-    final List<int> tokenStart = [];
-    for (final t in _tokens) {
-      tokenStart.add(pos);
-      pos += t.text.length;
-    }
-
+    // _tokenStart is pre-built in _startPractice — no O(n) loop here.
     return SingleChildScrollView(
       controller: _scrollCtrl,
       child: Wrap(
         children: List.generate(_tokens.length, (ti) {
-          final token   = _tokens[ti];
-          final tStart  = tokenStart[ti];
-          final tEnd    = tStart + token.text.length;
-          final isCurrent = _currentIndex >= tStart && _currentIndex < tEnd;
+          final token  = _tokens[ti];
+          final tStart = _tokenStart[ti];
+          final tEnd   = tStart + token.text.length;
+          final isCurrent =
+              _currentIndex >= tStart && _currentIndex < tEnd;
 
-          // ── Paragraph break marker ─────────────────────────────────────
+          // ── Paragraph break marker ──────────────────────────────────────
           if (token.isParagraph) {
             return SizedBox(
               width: double.infinity,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Row(children: [
-                  Container(
-                    width: 28, height: 1,
-                    color: AppTheme.cardBorder,
-                  ),
+                  Container(width: 28, height: 1, color: AppTheme.cardBorder),
                   const SizedBox(width: 8),
                   Container(
                     key: isCurrent ? _cursorKey : null,
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 4, vertical: 2),
                     decoration: isCurrent
                         ? BoxDecoration(
                             color: _lastWasWrong
@@ -534,8 +561,8 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
                                 : AppTheme.textMuted)),
                   ),
                   const SizedBox(width: 8),
-                  Expanded(
-                      child: Container(height: 1, color: AppTheme.cardBorder)),
+                  Expanded(child:
+                      Container(height: 1, color: AppTheme.cardBorder)),
                 ]),
               ),
             );
@@ -543,8 +570,8 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
 
           // ── Space token ────────────────────────────────────────────────
           if (token.text == ' ') {
-            final done     = _currentIndex > tStart;
-            final isCurSp  = _currentIndex == tStart;
+            final done    = _currentIndex > tStart;
+            final isCurSp = _currentIndex == tStart;
             return Container(
               key: isCurSp ? _cursorKey : null,
               child: Text(
@@ -562,44 +589,43 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
           }
 
           // ── Word token: render character by character ──────────────────
-          // NOTE: key is on the individual char below, NOT here — no duplicate keys
           return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(token.text.length, (ci) {
-                final globalIdx = tStart + ci;
-                final charDone  = globalIdx < _currentIndex;
-                final charCur   = globalIdx == _currentIndex;
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(token.text.length, (ci) {
+              final globalIdx = tStart + ci;
+              final charDone  = globalIdx < _currentIndex;
+              final charCur   = globalIdx == _currentIndex;
 
-                Color charColor;
-                Color? charBg;
+              Color  charColor;
+              Color? charBg;
 
-                if (charDone) {
-                  charColor = AppTheme.textSecondary.withValues(alpha: 0.45);
-                } else if (charCur) {
-                  charColor = _lastWasWrong
-                      ? AppTheme.error
-                      : AppTheme.textPrimary;
-                  charBg    = _lastWasWrong
-                      ? AppTheme.error.withValues(alpha: 0.18)
-                      : _accent.withValues(alpha: 0.18);
-                } else {
-                  charColor = AppTheme.textPrimary;
-                }
+              if (charDone) {
+                charColor = AppTheme.textSecondary.withValues(alpha: 0.45);
+              } else if (charCur) {
+                charColor = _lastWasWrong
+                    ? AppTheme.error
+                    : AppTheme.textPrimary;
+                charBg = _lastWasWrong
+                    ? AppTheme.error.withValues(alpha: 0.18)
+                    : _accent.withValues(alpha: 0.18);
+              } else {
+                charColor = AppTheme.textPrimary;
+              }
 
-                return Container(
-                  key: charCur ? _cursorKey : null,
-                  padding: const EdgeInsets.symmetric(vertical: 2),
-                  decoration: charBg != null
-                      ? BoxDecoration(
-                          color: charBg,
-                          borderRadius: BorderRadius.circular(3))
-                      : null,
-                  child: Text(
-                    token.text[ci],
-                    style: AppTheme.mono(20, color: charColor),
-                  ),
-                );
-              }),
+              return Container(
+                key: charCur ? _cursorKey : null,
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                decoration: charBg != null
+                    ? BoxDecoration(
+                        color:        charBg,
+                        borderRadius: BorderRadius.circular(3))
+                    : null,
+                child: Text(
+                  token.text[ci],
+                  style: AppTheme.mono(20, color: charColor),
+                ),
+              );
+            }),
           );
         }),
       ),
@@ -612,7 +638,8 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         const Text('✅', style: TextStyle(fontSize: 52)),
         const SizedBox(height: 12),
-        Text('Text Complete!', style: AppTheme.heading(24, color: AppTheme.success)),
+        Text('Text Complete!',
+            style: AppTheme.heading(24, color: AppTheme.success)),
         const SizedBox(height: 6),
         Text(
           '${(_targetFlat.length / 5).floor()} words typed',
@@ -620,11 +647,11 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
         ),
         const SizedBox(height: 24),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          _ResultStat('WPM',   '$_wpm',                         AppTheme.primary),
+          _ResultStat('WPM',   '$_wpm',                           AppTheme.primary),
           const SizedBox(width: 32),
           _ResultStat('ACC',   '${accuracy.toStringAsFixed(1)}%', AppTheme.gold),
           const SizedBox(width: 32),
-          _ResultStat('WORDS', '${_currentIndex ~/ 5}',          AppTheme.success),
+          _ResultStat('WORDS', '${_currentIndex ~/ 5}',           AppTheme.success),
           const SizedBox(width: 32),
           _ResultStat('TIME',
               '${_seconds ~/ 60}:${(_seconds % 60).toString().padLeft(2, "0")}',
@@ -633,22 +660,24 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
         const SizedBox(height: 28),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           OutlinedButton.icon(
-            icon: const Icon(Icons.refresh),
+            icon:  const Icon(Icons.refresh),
             label: const Text('AGAIN'),
             style: OutlinedButton.styleFrom(
                 foregroundColor: AppTheme.textSecondary,
-                side: const BorderSide(color: AppTheme.cardBorder),
-                padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 20)),
+                side:    const BorderSide(color: AppTheme.cardBorder),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 13, horizontal: 20)),
             onPressed: _startPractice,
           ),
           const SizedBox(width: 12),
           ElevatedButton.icon(
-            icon: const Icon(Icons.edit_outlined),
+            icon:  const Icon(Icons.edit_outlined),
             label: const Text('NEW TEXT'),
             style: ElevatedButton.styleFrom(
                 backgroundColor: _accent,
                 foregroundColor: AppTheme.background,
-                padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 20)),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 13, horizontal: 20)),
             onPressed: () => setState(() => _practiceMode = false),
           ),
         ]),
@@ -669,31 +698,35 @@ class _CustomTextScreenState extends State<CustomTextScreen> {
   ];
 }
 
-// ── Small helper widgets ──────────────────────────────────────────────────────
+// ── Helper widgets ────────────────────────────────────────────────────────────
 class _PresetChip {
   final String label, text;
   const _PresetChip(this.label, this.text);
 }
 
 class _Chip extends StatelessWidget {
-  final String l, v; final Color c;
-  const _Chip(this.l, this.v, this.c);
+  final String label, val;
+  final Color  color;
+  const _Chip(this.label, this.val, this.color);
   @override
-  Widget build(BuildContext ctx) => Row(children: [
-    Text(l, style: AppTheme.body(11, color: AppTheme.textMuted)
-        .copyWith(letterSpacing: 1)),
-    const SizedBox(width: 5),
-    Text(v, style: AppTheme.heading(16, color: c)),
-  ]);
+  Widget build(BuildContext context) => Row(children: [
+        Text(label,
+            style: AppTheme.body(11, color: AppTheme.textMuted)
+                .copyWith(letterSpacing: 1)),
+        const SizedBox(width: 5),
+        Text(val, style: AppTheme.heading(16, color: color)),
+      ]);
 }
 
 class _ResultStat extends StatelessWidget {
-  final String l, v; final Color c;
-  const _ResultStat(this.l, this.v, this.c);
+  final String label, val;
+  final Color  color;
+  const _ResultStat(this.label, this.val, this.color);
   @override
-  Widget build(BuildContext ctx) => Column(children: [
-    Text(v, style: AppTheme.heading(22, color: c)),
-    const SizedBox(height: 4),
-    Text(l, style: AppTheme.body(11, color: AppTheme.textSecondary)),
-  ]);
+  Widget build(BuildContext context) => Column(children: [
+        Text(val, style: AppTheme.heading(22, color: color)),
+        const SizedBox(height: 4),
+        Text(label,
+            style: AppTheme.body(11, color: AppTheme.textSecondary)),
+      ]);
 }

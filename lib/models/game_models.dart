@@ -12,9 +12,13 @@ extension DifficultyExt on Difficulty {
 
   String get description {
     switch (this) {
-      case Difficulty.beginner:     return 'Learn keys with on-screen keyboard guide';
-      case Difficulty.intermediate: return 'Sentences & paragraphs without hints';
-      case Difficulty.master:       return 'Complex text, high speed required';
+      case Difficulty.beginner:
+        // No mention of on-screen keyboard — a physical keyboard is required.
+        return 'Learn keys with finger placement guide and colour hints';
+      case Difficulty.intermediate:
+        return 'Sentences & paragraphs without hints';
+      case Difficulty.master:
+        return 'Complex text, high speed required';
     }
   }
 
@@ -67,13 +71,13 @@ class LanPlayer {
   LanPlayer({
     required this.id,
     required this.name,
-    this.progress = 0.0,
-    this.wpm = 0,
-    this.wordsTyped = 0,
-    this.finished = false,
+    this.progress       = 0.0,
+    this.wpm            = 0,
+    this.wordsTyped     = 0,
+    this.finished       = false,
     this.rank,
-    this.disconnected = false,
-    this.dnf = false,
+    this.disconnected   = false,
+    this.dnf            = false,
     this.finishElapsedMs,
     this.finishClientTimestampMs,
     this.finishServerTimestampMs,
@@ -81,81 +85,74 @@ class LanPlayer {
   });
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'progress': progress,
-    'wpm': wpm,
-    'finished': finished,
-    'rank': rank,
-    'wordsTyped': wordsTyped,
-    'disconnected': disconnected,
-    'dnf': dnf,
-    'finishElapsedMs': finishElapsedMs,
-    'finishClientTimestampMs': finishClientTimestampMs,
-    'finishServerTimestampMs': finishServerTimestampMs,
-    'lastSeenMs': lastSeenMs,
+    'id':                     id,
+    'name':                   name,
+    'progress':               progress,
+    'wpm':                    wpm,
+    'finished':               finished,
+    'rank':                   rank,
+    'wordsTyped':             wordsTyped,
+    'disconnected':           disconnected,
+    'dnf':                    dnf,
+    'finishElapsedMs':        finishElapsedMs,
+    'finishClientTimestampMs':finishClientTimestampMs,
+    'finishServerTimestampMs':finishServerTimestampMs,
+    'lastSeenMs':             lastSeenMs,
   };
 
   factory LanPlayer.fromJson(Map<String, dynamic> json) => LanPlayer(
-    id: json['id'],
-    name: json['name'],
-    progress: (json['progress'] as num).toDouble(),
-    wpm: json['wpm'] ?? 0,
-    finished: json['finished'] ?? false,
-    rank: json['rank'],
-    wordsTyped: json['wordsTyped'] ?? 0,
-    disconnected: json['disconnected'] ?? false,
-    dnf: json['dnf'] ?? false,
-    finishElapsedMs: json['finishElapsedMs'],
+    id:                      json['id'] as String,
+    name:                    json['name'] as String,
+    progress:               (json['progress'] as num).toDouble(),
+    wpm:                     json['wpm']          ?? 0,
+    finished:                json['finished']     ?? false,
+    rank:                    json['rank'],
+    wordsTyped:              json['wordsTyped']   ?? 0,
+    disconnected:            json['disconnected'] ?? false,
+    dnf:                     json['dnf']          ?? false,
+    finishElapsedMs:         json['finishElapsedMs'],
     finishClientTimestampMs: json['finishClientTimestampMs'],
     finishServerTimestampMs: json['finishServerTimestampMs'],
-    lastSeenMs: json['lastSeenMs'],
+    lastSeenMs:              json['lastSeenMs'],
   );
 }
 
+// ── LAN Race Phase ────────────────────────────────────────────────────────
 enum LanRacePhase { lobby, countdown, racing, results }
 
 extension LanRacePhaseExt on LanRacePhase {
   String get wireName {
     switch (this) {
-      case LanRacePhase.lobby:
-        return 'LOBBY';
-      case LanRacePhase.countdown:
-        return 'COUNTDOWN';
-      case LanRacePhase.racing:
-        return 'RACING';
-      case LanRacePhase.results:
-        return 'RESULTS';
+      case LanRacePhase.lobby:     return 'LOBBY';
+      case LanRacePhase.countdown: return 'COUNTDOWN';
+      case LanRacePhase.racing:    return 'RACING';
+      case LanRacePhase.results:   return 'RESULTS';
     }
   }
 
   static LanRacePhase fromWireName(String value) {
     switch (value) {
-      case 'COUNTDOWN':
-        return LanRacePhase.countdown;
-      case 'RACING':
-        return LanRacePhase.racing;
-      case 'RESULTS':
-        return LanRacePhase.results;
+      case 'COUNTDOWN': return LanRacePhase.countdown;
+      case 'RACING':    return LanRacePhase.racing;
+      case 'RESULTS':   return LanRacePhase.results;
       case 'LOBBY':
-      default:
-        return LanRacePhase.lobby;
+      default:          return LanRacePhase.lobby;
     }
   }
 }
 
 // ── LAN Message Types (wire protocol) ────────────────────────────────────
 class LanMessage {
-  static const String joinRequest = 'join_request';
-  static const String joinAck = 'join_ack';
-  static const String playerList = 'player_list';
+  static const String joinRequest   = 'join_request';
+  static const String joinAck       = 'join_ack';
+  static const String playerList    = 'player_list';
   static const String playerDisconnect = 'player_disconnect';
-  static const String startRace = 'start_race';
+  static const String startRace     = 'start_race';
   static const String progressUpdate = 'progress_update';
-  static const String finished = 'finished';
-  static const String raceComplete = 'race_complete';
-  static const String ping = 'ping';
-  static const String pong = 'pong';
-  static const String phaseUpdate = 'phase_update';
-  static const String error = 'error';
+  static const String finished      = 'finished';
+  static const String raceComplete  = 'race_complete';
+  static const String ping          = 'ping';
+  static const String pong          = 'pong';
+  static const String phaseUpdate   = 'phase_update';
+  static const String error         = 'error';
 }
