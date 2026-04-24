@@ -1,3 +1,4 @@
+<img width="1024" height="766" alt="TypingQuest - Brave 4_24_2026 1_06_32 PM" src="https://github.com/user-attachments/assets/2e9f57f6-5131-47ad-b953-70532bcc5678" />
 # TypingQuest 🎯⌨️
 
 > A fun, gamified typing trainer built for students. 
